@@ -37,9 +37,11 @@ public:
     }
 };
 
-//!
+//! A base class that offers the required object counter for intrusive pointers
 class ObjectCounter {
 protected:
+    //! Starts with counter zero
+    //! We dont want anyone to instantiate objects of this class so we make it protected
     ObjectCounter() : _counter(0) {
     }
 
