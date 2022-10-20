@@ -17,6 +17,7 @@
 // Yes hb are my initials. Respectfully.
 namespace hbthreads {
 
+//! Tired of including those so let's put them inside this namespace
 using namespace boost::context::detail;
 using namespace boost::context;
 
@@ -26,7 +27,6 @@ using namespace boost::context;
 template <typename T>
 using IntrusivePointer = boost::intrusive_ptr<T>;
 
-//! Tired of including those so let's put them inside this namespace
 //--------------------------------------------------
 // Allocators
 //--------------------------------------------------

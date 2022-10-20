@@ -113,7 +113,9 @@ int main(int argc, char* argv[]) {
                  "malloc(),realloc(),calloc() and free() are called, \n"
                  "you will get a printout on the screen with the size "
                  "requested (in hex), the result/returned pointer and \n"
-                 "the caller address."
+                 "the caller address. You should see only a couple of "
+                 "chunky calls to malloc() and respective free().\n"
+                 "Everything else should be pool-allocated.\n"
               << std::endl;
     malloc_hook_active = 1;
 

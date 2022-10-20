@@ -30,6 +30,7 @@ void PollReactor::onSocketOps(int fd, Operation ops) {
     switch (ops) {
         case Operation::Added: _sockets.insert(fd); break;
         case Operation::Removed: _sockets.erase(fd); break;
+        // We do not handle these yet - TODO
         case Operation::Modified: break;
         case Operation::NA: break;
     }
@@ -44,4 +45,5 @@ void PollReactor::rebuild() {
         pfd.events = POLLIN;
         index++;
     }
+    _dirty = false;
 }

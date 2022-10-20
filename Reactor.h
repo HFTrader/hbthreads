@@ -56,9 +56,6 @@ protected:
     //! Alert derived classes about one operation in a socket
     virtual void onSocketOps(int fd, Operation ops) = 0;
 
-    //! Act on all pending cached events (fd or thread)
-    void rebuild();
-
     //! notify all subscribers of this file descriptor about a read available
     void notifyEvent(int fd, EventType type);
 
