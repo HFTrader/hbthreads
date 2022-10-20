@@ -2,11 +2,13 @@
 # Reasons to use this script:
 # 1. you do not want to install the entire boost from your distro
 # 2. you need a static boost to use in your project 
-# 3. you want a single 
+# 3. you want a single-threaded version of boost for performance
 # 3. you need a newer version of boost, maybe the latest 
 # This script will build a minimal boost with just what is needed 
 # for this project. Unlike the full boost, this should take only 
 # a few seconds to compile
+
+# verbose and will stop the script if anything fails
 set -exo pipefail
 
 # defaults to instaling on /usr/local and building on /tmp
