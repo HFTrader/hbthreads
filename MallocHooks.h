@@ -5,4 +5,4 @@
 
 //! Defines if the malloc(), realloc(), calloc() and free() calls should be intercepted.
 //! Implemented in MallocHooks.cpp
-int malloc_hook_active;
+extern int malloc_hook_active;
