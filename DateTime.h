@@ -41,6 +41,14 @@ struct DateTime {
     std::int64_t nsecs() const {
         return epochns;
     }
+    //~ Returns the number of seconds
+    std::int64_t secs() const {
+        return epochns / 1000000000LL;
+    }
+
+    DateTime operator-(DateTime rhs) const {
+        return DateTime(epochns - rhs.epochns);
+    }
 
 private:
     //! Force user to use the static methods otherwise they will

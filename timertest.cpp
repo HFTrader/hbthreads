@@ -1,7 +1,8 @@
 #include "PollReactor.h"
 #include "EpollReactor.h"
 #include "MallocHooks.h"
-#include <sys/timerfd.h>
+#include "Timer.h"
+
 #include <iostream>
 #include <array>
 
@@ -11,39 +12,13 @@ using namespace hbthreads;
 // Example light thread
 //--------------------------------------------------
 
-//! Wraps a timerfd which is a file descriptor that will fire events
-//! at a predefined interval. This is a kernel facility so you dont
-//! have to keep a scheduler in parallel with epoll(). Convenient.
-struct Timer {
-    int fd;  //! The timerfd file descriptor
-    Timer() {
-        // Create a non-blocking descriptor
-        fd = ::timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK);
-
-        // Set to 100 ms interval notification
-        itimerspec ts;
-        memset(&ts, 0, sizeof(ts));
-        ts.it_interval.tv_nsec = 100 * 1000000;
-        ts.it_value.tv_nsec = 100 * 1000000;
-        int res = ::timerfd_settime(fd, 0, &ts, nullptr);
-        if (res != 0) {
-            std::cout << "Could not set the alarm:" << std::endl;
-            return;
-        }
-    }
-    ~Timer() {
-        // Close on destroy
-        ::close(fd);
-    }
-};
-
 class Worker : public LightThread {
 public:
     Worker(std::uint32_t id = 0) : _id(id) {
-        std::cout << "Creating worker " << _id << std::endl;
+        printf("Creating worker %d\n", _id);
     }
     ~Worker() {
-        std::cout << "Deleting worker " << _id << std::endl;
+        printf("Deleting worker %d\n", _id);
     }
 
     void run() override {
@@ -57,8 +32,8 @@ public:
                     break;
                 }
             }
-            std::cout << "Worker " << _id << "  fid " << ev->fd << "  Event " << counter++
-                      << std::endl;
+
+            printf("Worker %d  fid %d  Event %ld\n", _id, ev->fd, counter++);
         }
     }
 
@@ -71,6 +46,7 @@ const std::size_t stacksize = 4 * 1024;
 
 void test_poll() {
     Timer timer;
+    timer.start(DateTime::msecs(100));
     Pointer<PollReactor> mgr(new PollReactor(storage));
     Pointer<Worker> worker(new Worker);
     mgr->monitor(timer.fd, worker.get());
@@ -82,6 +58,7 @@ void test_poll() {
 
 void test_epoll() {
     Timer timer;
+    timer.start(DateTime::msecs(100));
     Pointer<EpollReactor> mgr(new EpollReactor(storage, DateTime::msecs(500)));
     Pointer<Worker> worker(new Worker);
     mgr->monitor(timer.fd, worker.get());
@@ -93,6 +70,7 @@ void test_epoll() {
 
 void test_multi_epoll() {
     std::array<Timer, 5> timers;
+    for (Timer& tm : timers) tm.start(DateTime::msecs(100));
     Pointer<EpollReactor> mgr(new EpollReactor(storage));
     std::array<Pointer<Worker>, 15> fleet;
     int counter = 0;
@@ -109,14 +87,14 @@ void test_multi_epoll() {
 }
 
 int main(int argc, char* argv[]) {
-    std::cout << "We are now turning on the malloc hook so every time "
-                 "malloc(),realloc(),calloc() and free() are called, \n"
-                 "you will get a printout on the screen with the size "
-                 "requested (in hex), the result/returned pointer and \n"
-                 "the caller address. You should see only a couple of "
-                 "chunky calls to malloc() and respective free().\n"
-                 "Everything else should be pool-allocated.\n"
-              << std::endl;
+    printf(
+        "We are now turning on the malloc hook so every time "
+        "malloc(),realloc(),calloc() and free() are called, \n"
+        "you will get a printout on the screen with the size "
+        "requested (in hex), the result/returned pointer and \n"
+        "the caller address. You should see only a couple of "
+        "chunky calls to malloc() and respective free().\n"
+        "Everything else should be pool-allocated.\n");
     malloc_hook_active = 1;
 
     //! This pool will allocate-only. It is supposed to be used upstream
@@ -130,10 +108,10 @@ int main(int argc, char* argv[]) {
     //! As this is __thread specific storage, it cannot be initialized statically
     storage = &buffer;
 
-    std::cout << "--------- Epoll test" << std::endl;
+    printf("--------- Epoll test\n");
     test_epoll();
-    std::cout << "--------- Poll test" << std::endl;
+    printf("--------- Poll test\n");
     test_poll();
-    std::cout << "--------- Multi-epoll test" << std::endl;
+    printf("--------- Multi-epoll test\n");
     test_multi_epoll();
 }

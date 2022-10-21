@@ -60,14 +60,17 @@ endif()
 add_library( hbthreads SHARED 
              LightThread.cpp Pointer.cpp 
              Reactor.cpp PollReactor.cpp EpollReactor.cpp 
-             MallocHooks.cpp )
+             MallocHooks.cpp Timer.cpp SocketUtils.cpp )
 target_link_libraries( hbthreads boost )
 set( HEADERS LightThread.h Pointer.h Reactor.h PollReactor.h 
-    EpollReactor.h MallocHooks.h )
+    EpollReactor.h MallocHooks.h Timer.h SocketUtils.h )
 set_target_properties( hbthreads PROPERTIES PUBLIC_HEADER "${HEADERS}" )
 
 add_executable( timertest timertest.cpp  )
-target_link_libraries( timertest hbthreads boost   )
+target_link_libraries( timertest hbthreads boost )
+
+add_executable( udptest udptest.cpp  )
+target_link_libraries( udptest hbthreads boost )
 
 #----------------------------------------------------------------------------------------
 # Install

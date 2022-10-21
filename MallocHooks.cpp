@@ -1,6 +1,11 @@
 
 #include <malloc.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdint.h>
+#include "BufferPrinter.h"
 
 extern "C" void* __libc_malloc(size_t size);
 extern "C" void __libc_free(void*);
@@ -14,7 +19,9 @@ static void* malloc_hook(size_t size, void* caller) {
     void* result;
     malloc_hook_active = 0;
     result = malloc(size);
-    fprintf(stderr, "malloc(0x%lx) = %p  from:%p\n", size, result, caller);
+    BufferPrinter<64> bf;
+    bf << "malloc(" << size << ")=" << result << " Caller:" << caller << "\n";
+    bf.printerr();
     malloc_hook_active = 1;
     return result;
 }
@@ -29,8 +36,10 @@ extern "C" void* malloc(size_t size) {
 
 static void free_hook(void* ptr, void* caller) {
     malloc_hook_active = 0;
-    fprintf(stderr, "free(%p)    from:%p\n", ptr, caller);
-    __libc_free(ptr);
+    BufferPrinter<64> bf;
+    bf << "free(" << ptr << ") caller:" << caller << "\n";
+    bf.printerr();
+    free(ptr);
     malloc_hook_active = 1;
 }
 
@@ -46,7 +55,10 @@ extern "C" void free(void* ptr) {
 static void* calloc_hook(size_t nmemb, size_t size, void* caller) {
     malloc_hook_active = 0;
     void* result = calloc(nmemb, size);
-    fprintf(stderr, "calloc(0x%lx,0x%lx) = %p   from:%p\n", nmemb, size, result, caller);
+    BufferPrinter<64> bf;
+    bf << "calloc(" << nmemb << "," << size << ") = " << result << "  caller:" << caller
+       << "\n";
+    bf.printerr();
     malloc_hook_active = 1;
     return result;
 }
@@ -62,7 +74,10 @@ extern "C" void* calloc(size_t nmemb, size_t size) {
 static void* realloc_hook(void* ptr, size_t size, void* caller) {
     malloc_hook_active = 0;
     void* result = realloc(ptr, size);
-    fprintf(stderr, "realloc(%p,0x%lx) = %p   from:%p\n", ptr, size, result, caller);
+    BufferPrinter<64> bf;
+    bf << "realloc(" << ptr << "," << size << ") = " << result << "  caller:" << caller
+       << "\n";
+    bf.printerr();
     malloc_hook_active = 1;
     return result;
 }
