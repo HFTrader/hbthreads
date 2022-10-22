@@ -72,6 +72,9 @@ target_link_libraries( timertest hbthreads boost )
 add_executable( udptest udptest.cpp  )
 target_link_libraries( udptest hbthreads boost )
 
+add_executable( tcptest tcptest.cpp  )
+target_link_libraries( tcptest hbthreads boost )
+
 #----------------------------------------------------------------------------------------
 # Install
 #----------------------------------------------------------------------------------------

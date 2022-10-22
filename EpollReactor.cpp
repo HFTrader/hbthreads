@@ -41,6 +41,10 @@ bool EpollReactor::work() {
         if ((ev.events & (EPOLLERR)) != 0) {
             notifyEvent(ev.data.fd, EventType::SocketError);
         }
+        // Notify hangup
+        if ((ev.events & (EPOLLHUP)) != 0) {
+            notifyEvent(ev.data.fd, EventType::SocketHangup);
+        }
     }
     return true;
 }

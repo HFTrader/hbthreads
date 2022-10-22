@@ -8,7 +8,7 @@ Timer::Timer() {
 
 bool Timer::start(DateTime interval) {
     // Create a non-blocking descriptor
-    fd = ::timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK);
+    fd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (fd < 0) {
         perror("Timer::start(): timerfd_create");
     }

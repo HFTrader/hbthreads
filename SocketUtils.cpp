@@ -9,6 +9,43 @@
 
 namespace hbthreads {
 
+int createTCPSocket() {
+    int fd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        perror("createClientSocket: socket() failed");
+        return -1;
+    }
+    return fd;
+}
+
+int createAndBindTCPSocket(const char *address, int port) {
+    int fd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        perror("createServerSocket: socket() failed");
+        return -1;
+    }
+
+    struct sockaddr_in servaddr;
+    memset(&servaddr, 0, sizeof(servaddr));
+
+    // Filling server information
+    servaddr.sin_family = AF_INET;  // IPv4
+    servaddr.sin_addr.s_addr = inet_addr(address);
+    servaddr.sin_port = htons(port);
+
+    int flags = 1;
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &flags, sizeof(flags)) < 0)
+        perror("createAndBindTCPSocket(): setsockopt(SO_REUSEADDR) failed");
+
+    // Bind the socket with the server address
+    if (bind(fd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
+        perror("createAndBindTCPSocket(): bind() failed");
+        return -1;
+    }
+
+    return fd;
+}
+
 int createUDPSocket() {
     int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0) {
