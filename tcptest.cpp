@@ -6,6 +6,7 @@
 // However in contrast with other platforms we will show
 // how simple the programming of the downstream side becomes
 // with the use of coroutines
+// Live Stream: https://youtu.be/ZreWGHvLAmc
 
 #include "EpollReactor.h"
 #include "MallocHooks.h"
@@ -39,14 +40,18 @@ public:
     }
 
     void run() override {
+        // Create the socket and bind to the server address/port
         printf("Server::run() create socket\n");
         int server_fd = createAndBindTCPSocket(_address.c_str(), _port);
         if (server_fd < 0) {
             perror("Server::run() createAndBindTCPSocket");
             return;
         }
+
+        // Start tracking this socket
         _reactor->monitor(server_fd, this);
 
+        // Mandatory listening
         printf("Server::run() listen\n");
         int res = ::listen(server_fd, 5);
         if (res < 0) {
@@ -54,14 +59,14 @@ public:
             return;
         }
 
-        printf("Server::run() before loop\n");
-
         // Loops, waiting for clients to connect
         while (true) {
-            // Wait for packet
+            // Two types of events can come through here:
+            // 1. Accept requests through the socket server
+            // 2. Data through accepted sockets
             Event *ev = wait();
 
-            printf("Server::run() %d %d\n", ev->fd, (int)ev->type);
+            // First case, this is about handling connect requests
             if (ev->fd == server_fd) {
                 struct sockaddr_in clientaddr;
                 memset(&clientaddr, 0, sizeof(clientaddr));
@@ -72,9 +77,14 @@ public:
                     perror("Server::run() accept");
                     continue;
                 }
+
+                // We could do two things at this point:
+                // 1. Create a new object and monitor this socket into it
+                // 2. Just be lazy and funnel all data to this object (actual choice)
                 _reactor->monitor(client_fd, this);
 
             } else {
+                // This is actual data through connections
                 if (ev->type == EventType::SocketRead) {
                     printf("Server::run() Client socket read\n");
                     // It will be filled with the client information
@@ -95,12 +105,16 @@ public:
 
                     // If "quit" was received, finish the loop
                     if (::strchr(buffer, 0xFF) != NULL) break;
+
                 } else if ((ev->type == EventType::SocketError) ||
                            (ev->type == EventType::SocketHangup)) {
+                    // Something bad happened
                     _reactor->removeSocket(ev->fd);
                 }
             }
         }
+
+        // be a good citizen
         ::close(server_fd);
         printf("Exiting server loop\n");
     }
@@ -123,6 +137,37 @@ public:
         servaddr.sin_addr.s_addr = inet_addr(server_address);
     }
 
+    bool connect(int fd) {
+        while (true) {
+            // Attempt to connect
+            // On a 2nd pass this will check that the socket is connected already
+            int res = ::connect(fd, (sockaddr *)&servaddr, sizeof(servaddr));
+            if (res == 0) {
+                printf("Socket connected\n");
+                break;
+            }
+
+            // As the socket is non-blocking, it will return EINPROGRESS
+            // until it connects finally
+            if (errno != EINPROGRESS) {
+                perror("Client::run() connect");
+                ::close(fd);
+                return false;
+            }
+
+            // this is released by the timer event
+            Event *ev = wait();
+            if (ev->fd == fd) {
+                if ((ev->type != EventType::SocketRead) ||
+                    (ev->type != EventType::SocketHangup)) {
+                    printf("Client::run(): socket error \n");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     //! Loop 10 times, waiting first each time for a wake-up event,
     //! that will be provided by a timer (in main)
     void run() override {
@@ -140,38 +185,16 @@ public:
         _reactor->monitor(fd, this);
 
         // Creates and starts the timer
+        // This timer will both serve to help check the connect() but also
+        // "wake up" the thread to send data
         Timer timer;
         timer.start(DateTime::msecs(100));
+
         // Subscribe the client to the timer
         _reactor->monitor(timer.fd, this);
 
-        // The connect loop
-        printf("Client::run() before loop\n");
-        while (true) {
-            printf("Client::run() Connect\n");
-            int res = ::connect(fd, (sockaddr *)&servaddr, sizeof(servaddr));
-            if (res == 0) {
-                printf("Socket connected\n");
-                break;
-            }
-
-            int err = errno;
-            if (err != EINPROGRESS) {
-                perror("Client::run() connect");
-                ::close(fd);
-                return;
-            }
-
-            // this is released by the timer event
-            Event *ev = wait();
-            if (ev->fd == fd) {
-                if ((ev->type != EventType::SocketRead) ||
-                    (ev->type != EventType::SocketHangup)) {
-                    printf("Client::run(): socket error \n");
-                    return;
-                }
-            }
-        }
+        // Connect to server
+        if (!connect(fd)) return;
 
         // Here we are connected
         for (int counter = 0; counter < 10; ++counter) {
