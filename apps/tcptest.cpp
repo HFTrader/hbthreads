@@ -191,7 +191,7 @@ public:
         timer.start(DateTime::msecs(100));
 
         // Subscribe the client to the timer
-        _reactor->monitor(timer.fd, this);
+        _reactor->monitor(timer.fd(), this);
 
         // Connect to server
         if (!connect(fd)) return;

@@ -132,7 +132,7 @@ int main() {
     Pointer<EpollReactor> mgr(new EpollReactor(storage, DateTime::msecs(500)));
 
     // Subscribe the client to the timer
-    mgr->monitor(timer.fd, client.get());
+    mgr->monitor(timer.fd(), client.get());
 
     // Subscribe the server to the server socket
     mgr->monitor(server_fd, server.get());

@@ -12,9 +12,30 @@ namespace hbthreads {
 //! have to keep a scheduler in parallel with epoll(). Convenient.
 //! This class is not part of the library but of the examples.
 struct Timer {
-    int fd;  //! The timerfd file descriptor
+    // The constructor creates a file descriptor that is guaranteed
+    // not to change through the lifetime of the object so it can be
+    // added to a monitor right away after object creation.
     Timer();
+
+    //! Starts the timer. Will fire at repeated intervals
     bool start(DateTime interval);
+
+    //! Starts the timer. Will fire at intervals after a delay
+    //! Absolute will make `delay` an absolute time instead of relative
+    bool start(DateTime delay, DateTime interval, bool absolute = false);
+
+    //! Starts the timer. Will fire at intervals after an absolute time
+    bool oneShot(DateTime initial);
+
+    //! Stops the timer
+    bool stop();
+
     ~Timer();
+
+    //! returns the file descriptor
+    int fd();
+
+private:
+    int _fd;  //! The timerfd file descriptor
 };
 }  // namespace hbthreads

@@ -49,7 +49,7 @@ void test_poll() {
     timer.start(DateTime::msecs(100));
     Pointer<PollReactor> mgr(new PollReactor(storage));
     Pointer<Worker> worker(new Worker);
-    mgr->monitor(timer.fd, worker.get());
+    mgr->monitor(timer.fd(), worker.get());
     worker->start(stacksize);
     while (mgr->active()) {
         mgr->work();
@@ -61,7 +61,7 @@ void test_epoll() {
     timer.start(DateTime::msecs(100));
     Pointer<EpollReactor> mgr(new EpollReactor(storage, DateTime::msecs(500)));
     Pointer<Worker> worker(new Worker);
-    mgr->monitor(timer.fd, worker.get());
+    mgr->monitor(timer.fd(), worker.get());
     worker->start(stacksize);
     while (mgr->active()) {
         mgr->work();
@@ -76,8 +76,8 @@ void test_multi_epoll() {
     int counter = 0;
     for (Pointer<Worker>& worker : fleet) {
         worker.reset(new Worker(++counter));
-        for (const Timer& timer : timers) {
-            mgr->monitor(timer.fd, worker.get());
+        for (Timer& timer : timers) {
+            mgr->monitor(timer.fd(), worker.get());
         }
         worker->start(stacksize);
     }

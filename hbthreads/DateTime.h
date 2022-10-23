@@ -49,6 +49,18 @@ struct DateTime {
     DateTime operator-(DateTime rhs) const {
         return DateTime(epochns - rhs.epochns);
     }
+    DateTime operator+(DateTime rhs) const {
+        return DateTime(epochns + rhs.epochns);
+    }
+
+    //! Returns a zero interval
+    static DateTime zero() {
+        return DateTime(0);
+    }
+
+    //! Returns the current time in epoch/UTC
+    enum class ClockType : uint8_t { RealTime = 1, Monotonic = 2 };
+    static DateTime now(ClockType clock = ClockType::RealTime);
 
 private:
     //! Force user to use the static methods otherwise they will

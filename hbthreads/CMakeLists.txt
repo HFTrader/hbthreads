@@ -1,9 +1,15 @@
 
 
 add_library( hbthreads SHARED 
-             LightThread.cpp Pointer.cpp 
-             Reactor.cpp PollReactor.cpp EpollReactor.cpp 
-             MallocHooks.cpp Timer.cpp SocketUtils.cpp )
+             DateTime.cpp
+             EpollReactor.cpp 
+             LightThread.cpp 
+             MallocHooks.cpp 
+             PollReactor.cpp 
+             Pointer.cpp 
+             Reactor.cpp 
+             SocketUtils.cpp 
+             Timer.cpp )
 target_link_libraries( hbthreads boost )
 set( HEADERS LightThread.h Pointer.h Reactor.h PollReactor.h 
     EpollReactor.h MallocHooks.h Timer.h SocketUtils.h )
