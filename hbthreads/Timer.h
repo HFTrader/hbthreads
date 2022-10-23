@@ -30,10 +30,16 @@ struct Timer {
     //! Stops the timer
     bool stop();
 
+    //! Closes the timer file descriptor if open
     ~Timer();
 
     //! returns the file descriptor
     int fd();
+
+    //! Checks the timer for an event, returns immediately with 0 if no
+    //! event exists. Returns -1 if an error occurred. Otherwise returns the number of
+    //! expired events between reads - usually one
+    int check() const;
 
 private:
     int _fd;  //! The timerfd file descriptor

@@ -61,3 +61,20 @@ Timer::~Timer() {
     // Close on destroy
     if (_fd >= 0) ::close(_fd);
 }
+
+int Timer::check() const {
+    uint64_t counter = 0;
+    int nb = read(_fd, &counter, sizeof(counter));
+    if (nb < 0) {
+        if (errno != EAGAIN) {
+            perror("read timerfd");
+            return -1;
+        }
+        return 0;
+    }
+    if (nb == 0) return 0;
+    if (nb != 8) {
+        return 0;
+    }
+    return counter;
+}

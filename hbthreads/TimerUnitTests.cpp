@@ -50,30 +50,26 @@ TEST(Timer, Constructor) {
 }
 
 TEST(Timer, Start) {
+    // Loops creating pairs of (init,interval) and checking for expected behavior
     for (int init = 0; init <= 40; init += 10) {
         DateTime initial = DateTime::msecs(init);
         for (int itv = 10; itv <= 40; itv *= 2) {
             DateTime interval = DateTime::msecs(itv);
+            // We want to test the single argument call for init==0
             Timer timer;
             if (init == 0) {
                 timer.start(interval);
             } else {
                 timer.start(initial, interval);
             }
+
+            // Reads the timer fd and checks the elapsed time for each one
             DateTime start = DateTime::now();
             DateTime finish = start + DateTime::msecs(1000);
             int fired = (init == 0) ? 1 : 0;
             while (fired < 10) {
-                uint64_t counter;
-                int res = read(timer.fd(), &counter, sizeof(counter));
-                if (res < 0) {
-                    if (errno != EAGAIN) {
-                        perror("read timerfd");
-                        ASSERT_EQ(errno, EAGAIN);
-                    }
-                }
-                if (res > 0) {
-                    ASSERT_EQ(res, 8);
+                int counter = timer.check();
+                if (counter > 0) {
                     ASSERT_EQ(counter, 1);
                     DateTime now = DateTime::now();
                     int64_t elapms = (now - start).msecs();
