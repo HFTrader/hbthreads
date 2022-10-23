@@ -7,10 +7,10 @@
 #include <stdint.h>
 #include "BufferPrinter.h"
 
-extern "C" void* __libc_malloc(size_t size);
-extern "C" void __libc_free(void*);
-extern "C" void* __libc_calloc(size_t, size_t);
-extern "C" void* __libc_realloc(void*, size_t);
+extern "C" void* __libc_malloc(size_t size);     // NOLINT(bugprone-reserved-identifier)
+extern "C" void __libc_free(void*);              // NOLINT(bugprone-reserved-identifier)
+extern "C" void* __libc_calloc(size_t, size_t);  // NOLINT(bugprone-reserved-identifier)
+extern "C" void* __libc_realloc(void*, size_t);  // NOLINT(bugprone-reserved-identifier)
 
 //! Set this to "1" in main to get the printouts
 int malloc_hook_active = 0;

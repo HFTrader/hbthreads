@@ -42,7 +42,7 @@ private:
 };
 
 // Let's just define this here for all the examples
-const std::size_t stacksize = 4 * 1024;
+const std::size_t stacksize = 4 * 1024ULL;
 
 void test_poll() {
     Timer timer;
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 
     //! This pool will allocate-only. It is supposed to be used upstream
     //! by other allocators. In this case we chain it with the one below
-    boost::container::pmr::monotonic_buffer_resource pool(8 * 1024);
+    boost::container::pmr::monotonic_buffer_resource pool(8 * 1024ULL);
 
     //! A fast pool that uses bin by size, which makes this super fast
     boost::container::pmr::unsynchronized_pool_resource buffer(&pool);

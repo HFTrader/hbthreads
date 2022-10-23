@@ -233,14 +233,14 @@ public:
 int main() {
     // See timertest.cpp for more explanation on these settings
     malloc_hook_active = 1;
-    boost::container::pmr::monotonic_buffer_resource pool(8 * 1024);
+    boost::container::pmr::monotonic_buffer_resource pool(8 * 1024ULL);
     boost::container::pmr::unsynchronized_pool_resource buffer(&pool);
     storage = &buffer;
 
     // Perhaps we should get this from the command line - or not
     const char *server_address = "127.0.0.1";
     int server_port = 8080;
-    const std::size_t stacksize = 4 * 1024;
+    const std::size_t stacksize = 4 * 1024ULL;
 
     // Creates the event loop reactor
     Pointer<EpollReactor> mgr(new EpollReactor(storage, DateTime::nsecs(-1)));

@@ -76,7 +76,7 @@ void EpollReactor::onSocketOps(int fd, Operation ops) {
                 }
             }
             break;
-        case Operation::Modified: break;
+        case Operation::Modified:
         case Operation::NA: break;
     }
 }
