@@ -205,15 +205,16 @@ public:
             // Consume the timer otherwise it will be called again right away
             char buf[8];
             int nb = ::read(ev->fd, buf, sizeof(buf));
-
-            // Create TCP message with a hello message and send
-            int sz = ::snprintf(hello, sizeof(hello), "Hello %d", counter);
-            int res = ::send(fd, hello, sz, MSG_DONTWAIT);
-            if (res <= 0) {
-                perror("Client::run() send");
-                break;
+            if (nb > 0) {
+                // Create TCP message with a hello message and send
+                int sz = ::snprintf(hello, sizeof(hello), "Hello %d", counter);
+                int res = ::send(fd, hello, sz, MSG_DONTWAIT);
+                if (res <= 0) {
+                    perror("Client::run() send");
+                    break;
+                }
+                printf("Client: %s\n", hello);
             }
-            printf("Client: %s\n", hello);
         }
 
         // Send a quit command so the server knows it's time to go

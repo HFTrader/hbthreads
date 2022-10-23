@@ -80,12 +80,13 @@ public:
             // Consume the timer otherwise it will be called again right away
             char buf[8];
             int nb = ::read(ev->fd, buf, sizeof(buf));
-
-            // Create UDP packet with a hello message and send
-            int sz = ::snprintf(hello, sizeof(hello), "Hello %d", counter);
-            sendto(fd, hello, sz, MSG_CONFIRM, (const struct sockaddr *)&servaddr,
-                   sizeof(servaddr));
-            printf("Client: %s\n", hello);
+            if (nb > 0) {
+                // Create UDP packet with a hello message and send
+                int sz = ::snprintf(hello, sizeof(hello), "Hello %d", counter);
+                sendto(fd, hello, sz, MSG_CONFIRM, (const struct sockaddr *)&servaddr,
+                       sizeof(servaddr));
+                printf("Client: %s\n", hello);
+            }
         }
 
         // Send a quit command so the server knows it's time to go
