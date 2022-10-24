@@ -16,3 +16,13 @@ add_test( NAME tcptest COMMAND tcptest )
 
 add_executable( switchtest switchtest.cpp  )
 target_link_libraries( switchtest hbthreads boost )
+
+include(CheckCSourceRuns)
+check_c_source_runs("#include <sys/eventfd.h>\nint main(){ return (eventfd(0,0)>=0) ? 0: 1;}" HAS_EVENTFD)
+
+message( "Has evenfd:${HAS_EVENTFD}")
+
+if (HAS_EVENTFD)
+add_executable( perftest perftest.cpp  )
+target_link_libraries( perftest hbthreads boost )
+endif()

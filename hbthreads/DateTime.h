@@ -46,11 +46,29 @@ struct DateTime {
         return epochns / 1000000000LL;
     }
 
-    DateTime operator-(DateTime rhs) const {
+    inline DateTime operator-(DateTime rhs) const {
         return DateTime(epochns - rhs.epochns);
     }
-    DateTime operator+(DateTime rhs) const {
+    inline DateTime operator+(DateTime rhs) const {
         return DateTime(epochns + rhs.epochns);
+    }
+    inline DateTime operator-() const {
+        return DateTime(-epochns);
+    }
+    inline bool operator<(DateTime rhs) const {
+        return epochns < rhs.epochns;
+    }
+    inline bool operator>(DateTime rhs) const {
+        return epochns > rhs.epochns;
+    }
+    inline bool operator<=(DateTime rhs) const {
+        return epochns <= rhs.epochns;
+    }
+    inline bool operator>=(DateTime rhs) const {
+        return epochns >= rhs.epochns;
+    }
+    inline bool operator==(DateTime rhs) const {
+        return epochns == rhs.epochns;
     }
 
     //! Returns a zero interval
