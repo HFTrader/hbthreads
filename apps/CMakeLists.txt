@@ -14,4 +14,5 @@ add_executable( tcptest tcptest.cpp  )
 target_link_libraries( tcptest hbthreads boost )
 add_test( NAME tcptest COMMAND tcptest )
 
-
+add_executable( switchtest switchtest.cpp  )
+target_link_libraries( switchtest hbthreads boost )
