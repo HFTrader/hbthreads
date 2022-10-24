@@ -21,6 +21,7 @@ struct FakeReactor : public Reactor {
     };
     void work() {
         // Every call will generate a notification event
+        start_ts = tic();
         notifyEvent(0, EventType::SocketRead);
     }
 };
