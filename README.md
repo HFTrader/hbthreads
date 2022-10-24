@@ -1,6 +1,8 @@
 # hbthreads
 A coroutine-based reactor library with a few unique features:
-- simple to read for learning purposes
+- simple to read for learning purposes: it uses **very basic** Modern C++ constructs that newcomers will find easy(ier) to grasp
+- it has code complexity first and performance second as goals. We do not compromise on these.
+- full documented, plenty of unit tests to learn
 - minimal, voluntarily incomplete so it can be easily extended
 - built-in intrusive pointer with integrated pool allocator (no new/malloc calls)
 - uncomplicated coroutine semantics based on very basic (and fast) stack primitives 
@@ -13,8 +15,4 @@ to be necessarily complicated. I hope also to provide some learning material for
 https://lucisqr.substack.com/
 
 # TODO
-- Conan recipe
-- Unit Tests
-- Performance Tests
--- Context switch 
--- Latency tests
+Please check our [issues page on Github](https://github.com/HFTrader/hbthreads/issues) for our ever-changing list of requirements.
