@@ -14,7 +14,7 @@
 #include <limits>
 #include <cassert>
 
-// Yes hb are my initials. Respectfully.
+//! Namespace for light coroutines and respective reactor mechanism
 namespace hbthreads {
 
 //! Tired of including those so let's put them inside this namespace

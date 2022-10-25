@@ -41,35 +41,47 @@ struct DateTime {
     std::int64_t nsecs() const {
         return epochns;
     }
-    //~ Returns the number of seconds
+    //! Returns the number of seconds
     std::int64_t secs() const {
         return epochns / 1000000000LL;
     }
 
+    //! \defgroup Operators DateTime operator overloading
+    //! @{
+
+    //! Binary subtraction
     inline DateTime operator-(DateTime rhs) const {
         return DateTime(epochns - rhs.epochns);
     }
+    //! Binary addition
     inline DateTime operator+(DateTime rhs) const {
         return DateTime(epochns + rhs.epochns);
     }
+    //! Unary negation
     inline DateTime operator-() const {
         return DateTime(-epochns);
     }
+    //! Binary less
     inline bool operator<(DateTime rhs) const {
         return epochns < rhs.epochns;
     }
+    //! Binary greater
     inline bool operator>(DateTime rhs) const {
         return epochns > rhs.epochns;
     }
+    //! Binary less or equal
     inline bool operator<=(DateTime rhs) const {
         return epochns <= rhs.epochns;
     }
+    //! Binary greater or equal
     inline bool operator>=(DateTime rhs) const {
         return epochns >= rhs.epochns;
     }
+    //! Binary equal
     inline bool operator==(DateTime rhs) const {
         return epochns == rhs.epochns;
     }
+    //! @}
 
     //! Returns a zero interval
     static DateTime zero() {
