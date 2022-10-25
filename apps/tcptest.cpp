@@ -24,7 +24,8 @@
 
 using namespace hbthreads;
 
-//! The server will receive an UDP packet and print its contents
+//! The server will listen and accept TCP connections
+//! Once accepted, it will read and print the sender's contents
 class Server : public LightThread {
     Pointer<Reactor> _reactor;
     std::string _address;

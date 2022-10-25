@@ -26,3 +26,6 @@ if (HAS_EVENTFD)
 add_executable( perftest perftest.cpp  )
 target_link_libraries( perftest hbthreads boost )
 endif()
+
+add_executable( coroexample coroexample.cpp )
+target_link_libraries( coroexample hbthreads boost )
