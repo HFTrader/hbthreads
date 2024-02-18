@@ -2,6 +2,8 @@
 #----------------------------------------------------------------------------------------
 # The library itself and usage examples
 #----------------------------------------------------------------------------------------
+list( APPEND ALL_TESTS timertest udptest tcptest switchtest coroexample )
+
 add_executable( timertest timertest.cpp  )
 target_link_libraries( timertest hbthreads boost )
 add_test( NAME timertest COMMAND timertest )
@@ -23,9 +25,11 @@ check_c_source_runs("#include <sys/eventfd.h>\nint main(){ return (eventfd(0,0)>
 message( "Has evenfd:${HAS_EVENTFD}")
 
 if (HAS_EVENTFD)
-add_executable( perftest perftest.cpp  )
-target_link_libraries( perftest hbthreads boost )
+    add_executable( perftest perftest.cpp  )
+    target_link_libraries( perftest hbthreads boost )
+    list( APPEND ALL_TESTS perftest )
 endif()
 
 add_executable( coroexample coroexample.cpp )
 target_link_libraries( coroexample hbthreads boost )
+

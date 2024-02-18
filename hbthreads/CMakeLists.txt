@@ -23,19 +23,21 @@ set_target_properties( hbthreads PROPERTIES PUBLIC_HEADER "${HEADERS}" )
 #----------------------------------------------------------------------------------------
 # Testing
 #----------------------------------------------------------------------------------------
-add_executable( unit_tests 
- BufferPrinterUnitTests.cpp
- DateTimeUnitTests.cpp
- EpollReactorUnitTests.cpp
- ImportedTypesUnitTests.cpp
- LightThreadUnitTests.cpp
- MallocHooksUnitTests.cpp
- PointerUnitTests.cpp
- PollReactorUnitTests.cpp
- ReactorUnitTests.cpp
- SocketUtilsUnitTests.cpp
- TimerUnitTests.cpp )
-target_link_libraries( unit_tests hbthreads GTest::gtest_main )
+if ( BUILD_TESTS )
+    add_executable( unit_tests 
+    BufferPrinterUnitTests.cpp
+    DateTimeUnitTests.cpp
+    EpollReactorUnitTests.cpp
+    ImportedTypesUnitTests.cpp
+    LightThreadUnitTests.cpp
+    MallocHooksUnitTests.cpp
+    PointerUnitTests.cpp
+    PollReactorUnitTests.cpp
+    ReactorUnitTests.cpp
+    SocketUtilsUnitTests.cpp
+    TimerUnitTests.cpp )
+    target_link_libraries( unit_tests hbthreads GTest::gtest_main )
 
-gtest_discover_tests( unit_tests )
-
+    gtest_discover_tests( unit_tests )
+    list( APPEND ALL_TESTS unit_tests )
+endif()
