@@ -8,6 +8,7 @@ set( USE_LOCAL_BOOST OFF CACHE BOOL "Use locally build boost (see build_minimal_
 set( LOCAL_BOOST_PREFIX "/usr/local" CACHE PATH "Location of boost for the local build")
 set( LOCAL_BOOST_LIB_PREFIX "${LOCAL_BOOST_PREFIX}/lib" CACHE PATH "Location of boost libraries")
 set( LOCAL_BOOST_INCLUDE_PREFIX "${LOCAL_BOOST_PREFIX}/include" CACHE PATH "Location of boost headers")
+set( BUILD_SHARED_LIBS ON CACHE BOOL "Build shared or static libraries" )
 
 # Turn this on only after careful consideration of your application usage
 # Note that if you enable this, you will need to add -DUSE_SMALL_SIZE and/or
@@ -26,8 +27,7 @@ cmake_minimum_required( VERSION 3.10 )
 project( hbthreads LANGUAGES C CXX VERSION 1.0.1 )
 
 set(CMAKE_CXX_STANDARD 14)
-
-    if ( USE_SMALL_SIZE )
+if ( USE_SMALL_SIZE )
     add_compile_options( -DUSE_SMALL_SIZE )
 endif()
 if ( USE_SMALL_COUNTER )
