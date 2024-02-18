@@ -116,7 +116,7 @@ add_subdirectory(apps)
 #----------------------------------------------------------------------------------------
 # Install
 #----------------------------------------------------------------------------------------
-install (TARGETS hbthreads ${ALL_TESTS}
+install (TARGETS ${ALL_TESTS}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

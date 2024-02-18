@@ -16,9 +16,23 @@ else()
 endif()
 
 target_link_libraries( hbthreads boost )
-set( HEADERS LightThread.h Pointer.h Reactor.h PollReactor.h 
-    EpollReactor.h MallocHooks.h Timer.h SocketUtils.h )
+set( HEADERS 
+    LightThread.h 
+    Pointer.h 
+    Reactor.h 
+    PollReactor.h 
+    EpollReactor.h 
+    MallocHooks.h 
+    Timer.h 
+    SocketUtils.h )
 set_target_properties( hbthreads PROPERTIES PUBLIC_HEADER "${HEADERS}" )
+
+install (TARGETS hbthreads 
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    PUBLIC_HEADER DESTINATION include/hbthreads
+)
 
 #----------------------------------------------------------------------------------------
 # Testing
