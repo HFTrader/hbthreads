@@ -54,14 +54,14 @@ struct BufferPrinter {
         return out;
     }
 
-    // Stream/print 16 bit integers
+    //! Stream/print 16 bit integers
     friend BufferPrinter& operator<<(BufferPrinter& out, uint16_t value) {
         out << "0x";
         out.printhex(value);
         return out;
     }
 
-    // Stream/print 32 bit integers - but will print as 16 if small enough
+    //! Stream/print 32 bit integers - but will print as 16 if small enough
     friend BufferPrinter& operator<<(BufferPrinter& out, uint32_t value) {
         if (uint16_t(value) == value) return out << uint16_t(value);
         out << "0x";
@@ -69,7 +69,7 @@ struct BufferPrinter {
         return out;
     }
 
-    // Stream/print 64 bit integers - but will print as 32 if small enough
+    //! Stream/print 64 bit integers - but will print as 32 if small enough
     friend BufferPrinter& operator<<(BufferPrinter& out, uint64_t value) {
         if (uint32_t(value) == value) return out << uint32_t(value);
         out << "0x";
@@ -77,12 +77,12 @@ struct BufferPrinter {
         return out;
     }
 
-    // Stream/prints a pointer
+    //! Stream/prints a pointer
     friend BufferPrinter& operator<<(BufferPrinter& out, void* ptr) {
         return out << reinterpret_cast<uint64_t>(ptr);
     }
 
-    // Stream/prints an object pointer
+    //! Stream/prints an object pointer
     template <typename T>
     friend BufferPrinter& operator<<(BufferPrinter& out, T const* const ptr) {
         return out << reinterpret_cast<uint64_t>(ptr);

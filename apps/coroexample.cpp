@@ -22,6 +22,10 @@ static int MAXCOUNT = 3;
 //////////////////////////////////////////////////
 // Coroutines part
 //////////////////////////////////////////////////
+
+/**
+ * A coroutines version of the Trader algorithm, below
+ */
 struct Worker : public LightThread {
     void run() override {
         int position = 0;
@@ -58,6 +62,9 @@ void coro_example() {
 // Traditional programming
 //////////////////////////////////////////////////
 
+/**
+ * A Traditional trader algorithm
+ */
 struct Trader {
     int position;
     int loop;

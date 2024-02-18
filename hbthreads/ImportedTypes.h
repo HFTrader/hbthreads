@@ -82,6 +82,7 @@ struct FlatMap : public BoostFlatMap<Key, Type, Comp> {
 template <typename Type, size_t N>
 using BoostSmallVector = boost::container::small_vector<Type, N, Allocator<Type>>;
 
+//! This wrapper will prevent the creation of an internal pool and waste time
 template <typename Type, size_t N>
 struct SmallVector : BoostSmallVector<Type, N> {
     using allocator_type = typename BoostSmallVector<Type, N>::allocator_type;

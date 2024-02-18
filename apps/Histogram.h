@@ -5,15 +5,23 @@
 
 namespace hbthreads {
 
-// Statistics results
+/**
+ * Statistics results
+ */
 struct Stats {
     uint64_t samples;
     double median;
     double average;
 };
 
+/**
+ * A simple histogram class with fixed N bins.
+ */
 template <size_t N>
 struct Histogram {
+    /**
+     * The histogram bin containing aggregate stats
+     */
     struct Bin {
         double sum = 0;
         double sum2 = 0;

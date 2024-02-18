@@ -12,6 +12,9 @@ using namespace hbthreads;
 
 uint64_t start_ts = tic();
 
+/**
+ * A reactor that only generates a notification
+ */
 struct FakeReactor : public Reactor {
     using Reactor::Reactor;
     FakeReactor(MemoryStorage* mem) : Reactor(mem) {
@@ -26,7 +29,9 @@ struct FakeReactor : public Reactor {
     }
 };
 
-// The worker will just wait for events in an empty loop
+/**
+ * The worker will just wait for events in an empty loop
+ */
 struct Worker : public LightThread {
     int64_t numloops;
     Histogram<100> hist;

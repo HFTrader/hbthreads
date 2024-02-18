@@ -138,6 +138,7 @@ public:
         servaddr.sin_addr.s_addr = inet_addr(server_address);
     }
 
+    //! Connects to the given file descriptor
     bool connect(int fd) {
         while (true) {
             // Attempt to connect

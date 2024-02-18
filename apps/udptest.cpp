@@ -54,10 +54,13 @@ public:
     }
 };
 
-//! Client will be woken up by an external timer and send a custom
-//! packet to the server.
+/**
+ * Client will be woken up by an external timer and send a custom
+ *  packet to the server.
+ */
 class Client : public LightThread {
 public:
+    //! Constructor
     Client(const char *server_address, int server_port) {
         // Filling server information
         memset(&servaddr, 0, sizeof(servaddr));

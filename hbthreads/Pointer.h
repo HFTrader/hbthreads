@@ -116,8 +116,11 @@ class Object : public virtual ObjectCounter {
 
 }  // namespace hbthreads
 
-//! Allows intrusive pointers to be keys in sets and maps
 namespace std {
+
+/**
+ * Allows intrusive pointers to be keys in sets and maps
+ */
 template <typename T>
 struct hash<hbthreads::Pointer<T>> {
     typedef std::size_t result_type;
@@ -125,4 +128,5 @@ struct hash<hbthreads::Pointer<T>> {
         return reinterpret_cast<std::size_t>(rhs.get());
     }
 };
+
 };  // namespace std

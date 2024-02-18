@@ -12,6 +12,9 @@ using namespace hbthreads;
 
 uint64_t start_tic = 0;
 
+/**
+ * The producer thread waits for events and fires a notification
+ */
 struct Producer : public LightThread {
     Producer(int fd, int64_t nloops) : efd(fd), numloops(nloops) {
     }
@@ -35,6 +38,10 @@ struct Producer : public LightThread {
     }
 };
 
+/**
+ * Consumer thread waits for notifications and adds the elapsed time
+ * to histogram
+ */
 struct Consumer : public LightThread {
     int64_t numloops;
     Histogram<500> hist;
