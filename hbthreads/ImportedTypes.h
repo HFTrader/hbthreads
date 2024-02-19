@@ -13,6 +13,7 @@
 #include <boost/fiber/protected_fixedsize_stack.hpp>
 #include <limits>
 #include <cassert>
+#include <cstdint>
 
 //! Namespace for light coroutines and respective reactor mechanism
 namespace hbthreads {
