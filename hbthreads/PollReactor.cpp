@@ -31,7 +31,7 @@ void PollReactor::onSocketOps(int fd, Operation ops) {
         case Operation::Added: _sockets.insert(fd); break;
         case Operation::Removed: _sockets.erase(fd); break;
         // We do not handle these yet - TODO
-        case Operation::Modified: break;
+        case Operation::Modified:
         case Operation::NA: break;
     }
 }

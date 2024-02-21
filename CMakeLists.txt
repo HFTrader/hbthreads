@@ -10,6 +10,13 @@ set( LOCAL_BOOST_LIB_PREFIX "${LOCAL_BOOST_PREFIX}/lib" CACHE PATH "Location of 
 set( LOCAL_BOOST_INCLUDE_PREFIX "${LOCAL_BOOST_PREFIX}/include" CACHE PATH "Location of boost headers")
 set( BUILD_SHARED_LIBS ON CACHE BOOL "Build shared or static libraries" )
 set( BUILD_TESTS ON CACHE BOOL "Build internal unit tests")
+set( CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Default build type" )
+set( CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Exports a database for clang-tidy")
+
+set( HBTHREADS_USES_CLANG_TIDY ON CACHE BOOL "Add clang-tidy during compilation" )
+if ( HBTHREADS_USES_CLANG_TIDY )
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-p=${CMAKE_BINARY_DIR};--warnings-as-errors=*" CACHE STRING "Clang-tidy command line " )
+endif()
 
 # Turn this on only after careful consideration of your application usage
 # Note that if you enable this, you will need to add -DUSE_SMALL_SIZE and/or

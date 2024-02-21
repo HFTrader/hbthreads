@@ -17,14 +17,20 @@ endif()
 
 target_link_libraries( hbthreads boost )
 set( HEADERS 
-    LightThread.h 
-    Pointer.h 
-    Reactor.h 
-    PollReactor.h 
+    AsmUtils.h
+    BufferPrinter.h
+    DateTime.h
     EpollReactor.h 
+    Histogram.h
+    ImportedTypes.h    
+    LightThread.h 
     MallocHooks.h 
+    Pointer.h 
+    PollReactor.h 
+    Reactor.h 
+    SocketUtils.h 
     Timer.h 
-    SocketUtils.h )
+)
 set_target_properties( hbthreads PROPERTIES PUBLIC_HEADER "${HEADERS}" )
 
 install (TARGETS hbthreads 
