@@ -8,6 +8,7 @@ set( SOURCE_FILES
              Pointer.cpp 
              Reactor.cpp 
              SocketUtils.cpp 
+             StringUtils.cpp
              Timer.cpp )
 if ( BUILD_SHARED_LIBS ) 
     add_library( hbthreads SHARED ${SOURCE_FILES} )
@@ -29,6 +30,7 @@ set( HEADERS
     PollReactor.h 
     Reactor.h 
     SocketUtils.h 
+    StringUtils.h
     Timer.h 
 )
 set_target_properties( hbthreads PROPERTIES PUBLIC_HEADER "${HEADERS}" )
@@ -55,6 +57,7 @@ if ( BUILD_TESTS )
     PollReactorUnitTests.cpp
     ReactorUnitTests.cpp
     SocketUtilsUnitTests.cpp
+    StringUtilsUnitTests.cpp
     TimerUnitTests.cpp )
     target_link_libraries( unit_tests hbthreads GTest::gtest_main )
 

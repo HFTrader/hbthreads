@@ -4,6 +4,9 @@
 #----------------------------------------------------------------------------------------
 list( APPEND ALL_TESTS timertest udptest tcptest switchtest coroexample )
 
+add_executable( mclisten mclisten.cpp ) 
+target_link_libraries( mclisten hbthreads boost )
+
 add_executable( timertest timertest.cpp  )
 target_link_libraries( timertest hbthreads boost )
 add_test( NAME timertest COMMAND timertest )

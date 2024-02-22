@@ -13,7 +13,7 @@ set( BUILD_TESTS ON CACHE BOOL "Build internal unit tests")
 set( CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Default build type" )
 set( CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Exports a database for clang-tidy")
 
-set( HBTHREADS_USES_CLANG_TIDY ON CACHE BOOL "Add clang-tidy during compilation" )
+set( HBTHREADS_USES_CLANG_TIDY OFF CACHE BOOL "Add clang-tidy during compilation" )
 if ( HBTHREADS_USES_CLANG_TIDY )
     set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-p=${CMAKE_BINARY_DIR};--warnings-as-errors=*" CACHE STRING "Clang-tidy command line " )
 endif()
@@ -78,9 +78,10 @@ if ( USE_LOCAL_BOOST )
 
     add_library( boost INTERFACE IMPORTED )
     set_target_properties( boost PROPERTIES 
-        INTERFACE_LINK_LIBRARIES "${BOOST_LIBS_STATIC}"
+        INTERFACE_LINK_LIBRARIES "pthread;${BOOST_LIBS_STATIC}"
         INTERFACE_INCLUDE_DIRECTORIES "${LOCAL_BOOST_INCLUDE_PREFIX}"
         INTERFACE_COMPILE_DEFINITIONS "HAVE_LOCAL_BOOST" 
+        INTERFACE_LINK_OPTIONS "-Wl,--no-as-needed"
     )
 else()
     # This is the "normal"  cmake boost-supported 
@@ -88,8 +89,9 @@ else()
     find_package(Boost COMPONENTS context container REQUIRED)
     add_library( boost INTERFACE IMPORTED )
     set_target_properties( boost PROPERTIES 
-        INTERFACE_LINK_LIBRARIES "Boost::context;Boost::container"
+        INTERFACE_LINK_LIBRARIES "pthread;Boost::context;Boost::container"
     )
+    target_link_options( boost PUBLIC "-Wl,--no-as-needed" )
 endif()
 
 #----------------------------------------------------------------------------------------
