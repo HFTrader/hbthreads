@@ -21,6 +21,7 @@ struct MCastListener : public LightThread {
     void run() override {
         // Create the sender socket
         char buf[4096];
+        long counter = 0;
         while (true) {
             // Wait for timer
             Event* ev = wait();
@@ -36,7 +37,7 @@ struct MCastListener : public LightThread {
 };
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
+    if (argc != 4) {
         printf("Usage: mclisten <address> <port> [<interface>]\n");
         return 0;
     }

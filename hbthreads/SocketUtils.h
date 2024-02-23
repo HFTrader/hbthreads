@@ -14,7 +14,7 @@ int createAndBindTCPSocket(const char *address, int port);
 int createUDPSocket();
 
 // Creates a datagram socket and binds to address/port
-int createAndBindUDPSocket(const char *address, int port);
+bool bindSocket(int fd, const char *address, int port);
 
 // Sets non blocking flag on socket
 bool setSocketNonBlocking(int sockid);

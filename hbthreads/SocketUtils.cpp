@@ -61,28 +61,22 @@ int createUDPSocket() {
     return fd;
 }
 
-int createAndBindUDPSocket(const char *address, int port) {
-    int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        perror("createServerSocket: socket() failed");
-        return -1;
-    }
-
+bool bindSocket(int fd, const char *address, int port) {
     struct sockaddr_in servaddr;
     memset(&servaddr, 0, sizeof(servaddr));
 
     // Filling server information
     servaddr.sin_family = AF_INET;  // IPv4
-    servaddr.sin_addr.s_addr = inet_addr(address);
+    servaddr.sin_addr.s_addr = address == nullptr ? INADDR_ANY : inet_addr(address);
     servaddr.sin_port = htons(port);
 
     // Bind the socket with the server address
     if (bind(fd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         perror("createServerSocket: bind() failed");
-        return -1;
+        return false;
     }
 
-    return fd;
+    return true;
 }
 
 bool setSocketNonBlocking(int sockid) {
@@ -141,20 +135,19 @@ bool parseIPAddress(const char *address, in_addr *addr) {
 
 bool setSocketMulticastJoin(int sockid, const char *ipaddr, int port,
                             const char *interface) {
-    // Create address
-    struct sockaddr_in bind_addr;
-    memset(&bind_addr, 0, sizeof(struct sockaddr_in));
-    bind_addr.sin_family = AF_INET;
-    bind_addr.sin_port = htons(port);
-    if (!parseIPAddress(ipaddr, &bind_addr.sin_addr)) {
-        fprintf(stderr, "Could not translate address %s\n", ipaddr);
+    // bind socket
+
+    if (!bindSocket(sockid, ipaddr, port)) {
         return false;
     }
 
     // create request
     struct ip_mreq groupreq;
     memset(&groupreq, 0, sizeof(groupreq));
-    groupreq.imr_multiaddr = bind_addr.sin_addr;
+    if (!parseIPAddress(ipaddr, &groupreq.imr_multiaddr)) {
+        fprintf(stderr, "Could not translate address %s\n", ipaddr);
+        return false;
+    }
     if (!parseIPAddress(interface, &groupreq.imr_interface)) {
         fprintf(stderr, "Could not translate address %s\n", interface);
         return false;

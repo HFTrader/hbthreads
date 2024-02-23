@@ -66,8 +66,9 @@ TEST(SocketUtils, createUDPSocket) {
 }
 
 TEST(SocketUtils, createAndBindUDPSocket) {
-    int fd = createAndBindUDPSocket("127.0.0.1", 19999);
+    int fd = createUDPSocket();
     EXPECT_GE(fd, 0);
+    EXPECT_TRUE(bindSocket(fd, "127.0.0.1", 19999));
 
     uint32_t opt;
     socklen_t len;

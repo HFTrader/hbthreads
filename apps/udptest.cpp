@@ -129,7 +129,8 @@ int main() {
 
     // Typically we would place this socket inside the server object
     // But I wanted to show that it is not strictly necessary
-    int server_fd = createAndBindUDPSocket(server_address, server_port);
+    int server_fd = createUDPSocket();
+    bindSocket(server_fd, server_address, server_port);
 
     // Creates the event loop reactor
     Pointer<EpollReactor> mgr(new EpollReactor(storage, DateTime::msecs(500)));
