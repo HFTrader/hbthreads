@@ -46,8 +46,8 @@ int main(int argc, char* argv[]) {
     const char* interface = argv[3];
 
     // See timertest.cpp for more explanation on these settings
-    malloc_hook_active = 1;
-    boost::container::pmr::monotonic_buffer_resource pool(8 * 1024 * 1024ULL);
+    malloc_hook_active = 0;
+    boost::container::pmr::monotonic_buffer_resource pool(std::size_t(8 * 1024 * 1024));
     boost::container::pmr::unsynchronized_pool_resource buffer(&pool);
     storage = &buffer;
 

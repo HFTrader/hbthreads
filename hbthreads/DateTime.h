@@ -10,6 +10,8 @@ namespace hbthreads {
 //! A wrapper around a 64-bit time in nanoseconds
 //! If a date, it can be epoch but it can also be an interval.
 struct DateTime {
+    static constexpr std::int64_t NANOS_IN_SECOND = 1000000000LL;
+
     //! Zero it
     DateTime() : epochns(0) {
     }
@@ -43,7 +45,11 @@ struct DateTime {
     }
     //! Returns the number of seconds
     std::int64_t secs() const {
-        return epochns / 1000000000LL;
+        return epochns / NANOS_IN_SECOND;
+    }
+    //! Returns the nanoseconds part of the time
+    std::int64_t nanos() const {
+        return epochns % NANOS_IN_SECOND;
     }
 
     //! \defgroup Operators DateTime operator overloading
