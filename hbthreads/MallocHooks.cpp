@@ -12,6 +12,12 @@ extern "C" void __libc_free(void*);              // NOLINT(bugprone-reserved-ide
 extern "C" void* __libc_calloc(size_t, size_t);  // NOLINT(bugprone-reserved-identifier)
 extern "C" void* __libc_realloc(void*, size_t);  // NOLINT(bugprone-reserved-identifier)
 
+// Inform the linker that the malloc/free/realloc symbols here are weak
+// so they are overwritten by the GLIBC symbols in case of static linking
+#pragma weak malloc
+#pragma weak free
+#pragma weak realloc
+
 //! Set this to "1" in main to get the printouts
 int malloc_hook_active = 0;
 
