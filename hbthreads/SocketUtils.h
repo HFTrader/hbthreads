@@ -30,4 +30,7 @@ bool parseIPAddress(const char *address, int server_port, sockaddr_in *addr);
 bool setSocketMulticastJoin(int sockid, const char *ipaddr, int port,
                             const char *interface = nullptr);
 
+//! Sets the reuse flag on a socket
+bool setSocketReuseFlag(int sockid);
+
 }  // namespace hbthreads

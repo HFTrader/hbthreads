@@ -164,4 +164,14 @@ bool setSocketMulticastJoin(int sockid, const char *ipaddr, int port,
     return true;
 }
 
+bool setSocketReuseFlag(int sockid) {
+    int reuse = 1;
+    if (setsockopt(sockid, SOL_SOCKET, SO_REUSEADDR, (void *)&reuse, sizeof(reuse)) < 0) {
+        fprintf(stderr, "setSocketReuseFlag():setstockopt(SO_REUSEADDR) error: %s\n",
+                strerror(errno));
+        return false;
+    }
+    return true;
+}
+
 }  // namespace hbthreads

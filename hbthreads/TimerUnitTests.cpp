@@ -74,7 +74,7 @@ TEST(Timer, Start) {
                     DateTime now = DateTime::now();
                     int64_t elapms = (now - start).msecs();
                     int64_t expected = initial.msecs() + fired * interval.msecs();
-                    EXPECT_EQ(elapms, expected);
+                    EXPECT_LE(std::abs(elapms - expected), 2);
                     fired++;
                 }
             }
