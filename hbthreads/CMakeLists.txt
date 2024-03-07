@@ -34,6 +34,7 @@ set( HEADERS
     Timer.h 
 )
 set_target_properties( hbthreads PROPERTIES PUBLIC_HEADER "${HEADERS}" )
+target_include_directories( hbthreads PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. )
 
 install (TARGETS hbthreads 
     RUNTIME DESTINATION bin

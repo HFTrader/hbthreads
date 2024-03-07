@@ -7,6 +7,16 @@
 
 namespace hbthreads {
 
+struct DecomposedTime {
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int second;
+    int nanos;
+};
+
 //! A wrapper around a 64-bit time in nanoseconds
 //! If a date, it can be epoch but it can also be an interval.
 struct DateTime {
@@ -97,6 +107,9 @@ struct DateTime {
     //! Returns the current time in epoch/UTC
     enum class ClockType : uint8_t { RealTime = 1, Monotonic = 2 };
     static DateTime now(ClockType clock = ClockType::RealTime);
+
+    //! Decompose this DateTime object in its components
+    void decompose(struct DecomposedTime& dectime) const;
 
 private:
     //! Force user to use the static methods otherwise they will
