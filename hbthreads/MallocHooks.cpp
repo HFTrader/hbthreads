@@ -32,14 +32,6 @@ static void* malloc_hook(size_t size, void* caller) {
     return result;
 }
 
-extern "C" void* malloc(size_t size) {
-    void* caller = __builtin_frame_address(1);
-    if (malloc_hook_active) {
-        return malloc_hook(size, caller);
-    }
-    return __libc_malloc(size);
-}
-
 static void free_hook(void* ptr, void* caller) {
     malloc_hook_active = 0;
     BufferPrinter<64> bf;
@@ -47,15 +39,6 @@ static void free_hook(void* ptr, void* caller) {
     bf.printerr();
     free(ptr);
     malloc_hook_active = 1;
-}
-
-extern "C" void free(void* ptr) {
-    void* caller = __builtin_frame_address(1);
-    if (malloc_hook_active) {
-        free_hook(ptr, caller);
-        return;
-    }
-    __libc_free(ptr);
 }
 
 static void* calloc_hook(size_t nmemb, size_t size, void* caller) {
@@ -69,14 +52,6 @@ static void* calloc_hook(size_t nmemb, size_t size, void* caller) {
     return result;
 }
 
-extern "C" void* calloc(size_t nmemb, size_t size) {
-    void* caller = __builtin_frame_address(1);
-    if (malloc_hook_active) {
-        return calloc_hook(nmemb, size, caller);
-    }
-    return __libc_calloc(nmemb, size);
-}
-
 static void* realloc_hook(void* ptr, size_t size, void* caller) {
     malloc_hook_active = 0;
     void* result = realloc(ptr, size);
@@ -88,6 +63,33 @@ static void* realloc_hook(void* ptr, size_t size, void* caller) {
     return result;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-address"
+extern "C" void* malloc(size_t size) {
+    void* caller = __builtin_frame_address(1);
+    if (malloc_hook_active) {
+        return malloc_hook(size, caller);
+    }
+    return __libc_malloc(size);
+}
+
+extern "C" void free(void* ptr) {
+    void* caller = __builtin_frame_address(1);
+    if (malloc_hook_active) {
+        free_hook(ptr, caller);
+        return;
+    }
+    __libc_free(ptr);
+}
+
+extern "C" void* calloc(size_t nmemb, size_t size) {
+    void* caller = __builtin_frame_address(1);
+    if (malloc_hook_active) {
+        return calloc_hook(nmemb, size, caller);
+    }
+    return __libc_calloc(nmemb, size);
+}
+
 extern "C" void* realloc(void* ptr, size_t size) {
     void* caller = __builtin_frame_address(1);
     if (malloc_hook_active) {
@@ -95,3 +97,4 @@ extern "C" void* realloc(void* ptr, size_t size) {
     }
     return __libc_realloc(ptr, size);
 }
+#pragma GCC diagnostic pop

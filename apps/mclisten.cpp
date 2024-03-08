@@ -21,7 +21,6 @@ struct MCastListener : public LightThread {
     void run() override {
         // Create the sender socket
         char buf[4096];
-        long counter = 0;
         while (true) {
             // Wait for timer
             Event* ev = wait();

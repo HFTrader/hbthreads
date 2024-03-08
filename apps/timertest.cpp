@@ -86,7 +86,7 @@ void test_multi_epoll() {
     }
 }
 
-int main(int argc, char* argv[]) {
+int main() {
     printf(
         "We are now turning on the malloc hook so every time "
         "malloc(),realloc(),calloc() and free() are called, \n"

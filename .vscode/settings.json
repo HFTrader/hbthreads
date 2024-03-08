@@ -2,5 +2,8 @@
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/hbthreads",
         "${default}"
-    ]
+    ],
+    "files.associations": {
+        "cstdint": "cpp"
+    }
 }

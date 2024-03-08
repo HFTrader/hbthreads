@@ -11,7 +11,7 @@ DateTime DateTime::now(ClockType clock) {
         case ClockType::Monotonic: cid = CLOCK_MONOTONIC; break;
     }
     timespec ts;
-    int res = clock_gettime(cid, &ts);
+    __attribute__((unused)) int res = clock_gettime(cid, &ts);
     assert(res == 0);
     return DateTime::secs(ts.tv_sec) + DateTime::nsecs(ts.tv_nsec);
 }

@@ -19,7 +19,7 @@ struct FakeReactor : public Reactor {
     using Reactor::Reactor;
     FakeReactor(MemoryStorage* mem) : Reactor(mem) {
     }
-    virtual void onSocketOps(int fd, Operation ops){
+    virtual void onSocketOps(int /*fd*/, Operation /*ops*/){
         // just ignore
     };
     void work() {

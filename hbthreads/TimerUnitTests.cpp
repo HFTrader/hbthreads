@@ -65,7 +65,6 @@ TEST(Timer, Start) {
 
             // Reads the timer fd and checks the elapsed time for each one
             DateTime start = DateTime::now();
-            DateTime finish = start + DateTime::msecs(1000);
             int fired = (init == 0) ? 1 : 0;
             while (fired < 10) {
                 int counter = timer.check();

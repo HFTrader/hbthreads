@@ -98,9 +98,8 @@ private:
     template <typename T>
     void printhex(const T& x) {
         constexpr size_t N = sizeof(T) * 2;  // 2 chars per byte
-        char buf[N];
         T value = x;
-        for (int j = 0; j < N; ++j) {
+        for (size_t j = 0; j < N; ++j) {
             _ptr[N - 1 - j] = digit(value % 16);
             value /= 16;
         }

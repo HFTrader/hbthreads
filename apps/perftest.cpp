@@ -27,7 +27,7 @@ struct Producer : public LightThread {
 
             // Consume the timer
             char buf[32];
-            size_t nb = ::read(ev->fd, buf, sizeof(buf));
+            __attribute__((unused)) size_t nb = ::read(ev->fd, buf, sizeof(buf));
 
             // Fire the notification
             eventfd_write(efd, 1);

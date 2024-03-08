@@ -220,7 +220,7 @@ public:
         }
 
         // Send a quit command so the server knows it's time to go
-        hello[0] = 0xFF;
+        hello[0] = static_cast<char>(0xFF);
         hello[1] = 0;
         int res = send(fd, hello, 1, MSG_WAITALL);
         if (res <= 0) {

@@ -37,7 +37,7 @@ struct Histogram {
     void add(double value) {
         long kbin = lrint(((value - minimum) / (maximum - minimum)) * N);
         if (kbin < 0) kbin = 0;
-        if (kbin >= bins.size()) kbin = bins.size() - 1;
+        if (kbin >= (long)bins.size()) kbin = bins.size() - 1;
         Bin& bin(bins[kbin]);
         bin.sum += value;
         bin.sum2 += value * value;
