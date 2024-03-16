@@ -29,3 +29,14 @@ void DateTime::decompose(struct DecomposedTime& dectime) const {
     dectime.minute = result.tm_min;
     dectime.second = result.tm_sec;
 }
+
+DateTime DateTime::removeTZOffset(DateTime interval) {
+    const long HALFHOUR = 30LL * 60 * NANOS_IN_SECOND;
+    int64_t rem = interval.nsecs() % HALFHOUR;
+    if (rem < -HALFHOUR / 2) {
+        rem += HALFHOUR;
+    } else if (rem > HALFHOUR / 2) {
+        rem -= HALFHOUR;
+    }
+    return DateTime(rem);
+}

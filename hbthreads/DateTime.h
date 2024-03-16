@@ -104,6 +104,10 @@ struct DateTime {
         return DateTime(0);
     }
 
+    //! Removes the time zone offset (full half hours)
+    //! from this interval
+    static DateTime removeTZOffset(DateTime interval);
+
     //! Returns the current time in epoch/UTC
     enum class ClockType : uint8_t { RealTime = 1, Monotonic = 2 };
     static DateTime now(ClockType clock = ClockType::RealTime);
