@@ -1,7 +1,5 @@
 
-#----------------------------------------------------------------------------------------
-# The library itself and usage examples
-#----------------------------------------------------------------------------------------
+
 list( APPEND ALL_TESTS timertest udptest tcptest switchtest coroexample )
 
 add_executable( mclisten mclisten.cpp ) 

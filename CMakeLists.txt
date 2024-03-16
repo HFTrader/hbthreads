@@ -41,7 +41,8 @@ endif()
 if ( USE_SMALL_COUNTER )
     add_compile_options( -DUSE_SMALL_COUNTER )
 endif()
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/hbthreads })
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/hbthreads )
 
 #----------------------------------------------------------------------------------------
 # Dependencies
@@ -121,15 +122,17 @@ if ( BUILD_TESTS )
     include(CTest)
     include(GoogleTest)
 endif()
-add_subdirectory(hbthreads)
-add_subdirectory(apps)
 
-#----------------------------------------------------------------------------------------
-# Install
-#----------------------------------------------------------------------------------------
-install (TARGETS ${ALL_TESTS}
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/hbthreads
-)
+# hbthreads contains unit tests so it needs to be inside
+add_subdirectory(hbthreads)
+
+
+if ( BUILD_TESTS )
+    add_subdirectory(tests)
+    install (TARGETS ${ALL_TESTS}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        PUBLIC_HEADER DESTINATION include/hbthreads
+    )
+endif()
