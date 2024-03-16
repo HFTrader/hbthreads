@@ -21,7 +21,7 @@ void DateTime::decompose(struct DecomposedTime& dectime) const {
     time_t epoch = secs();
     struct tm result;
     gmtime_r(&epoch, &result);
-    dectime.nanos = (int)nsecs();
+    dectime.nanos = (int)nanos();
     dectime.year = result.tm_year + BASE_YEAR;
     dectime.month = result.tm_mon + 1;
     dectime.day = result.tm_mday;
