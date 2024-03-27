@@ -52,6 +52,7 @@ if ( BUILD_TESTS )
     DateTimeUnitTests.cpp
     EpollReactorUnitTests.cpp
     ImportedTypesUnitTests.cpp
+    IntrusiveIndexListUnitTests.cpp
     LightThreadUnitTests.cpp
     MallocHooksUnitTests.cpp
     PointerUnitTests.cpp
@@ -60,7 +61,7 @@ if ( BUILD_TESTS )
     SocketUtilsUnitTests.cpp
     StringUtilsUnitTests.cpp
     TimerUnitTests.cpp )
-    target_link_libraries( unit_tests hbthreads GTest::gtest_main )
+    target_link_libraries( unit_tests GTest::gtest_main hbthreads  )
 
     gtest_discover_tests( unit_tests )
     list( APPEND ALL_TESTS unit_tests )
