@@ -282,15 +282,16 @@ public:
         return _items[index].*HookType;
     }
 
-    template <typename Fn, typename C>
-    inline pointer find(Fn&& fun, const C& comp) {
-        for (auto& value : *this) {
-            if (fun(value, comp)) {
-                return &value;
+    template <typename Fn>
+    inline iterator find(Fn&& fun) {
+        for (iterator it = begin(); it != end(); ++it) {
+            if (fun(*it)) {
+                return it;
             }
         }
-        return nullptr;
+        return end();
     }
+
     inline void push_front(Index index) {
         Index second = _head.first;
         _head.first = index;
