@@ -174,4 +174,26 @@ bool setSocketReuseFlag(int sockid) {
     return true;
 }
 
+bool setSocketReceiveBufferSize(int sockfd, uint32_t bufsize) {
+    int res = setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize));
+    if (res < 0) {
+        fprintf(stderr, "setSocketReceiveBufferSize():setsockopt(SO_RCVBUF) error: %s\n",
+                strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+uint32_t getSocketReceiveBufferSize(int sockfd) {
+    int bufsize = 0;
+    socklen_t optlen = sizeof(bufsize);
+    int res = getsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &bufsize, &optlen);
+    if (res < 0) {
+        fprintf(stderr, "getSocketReceiveBufferSize():getsockopt(SO_RCVBUF) error: %s\n",
+                strerror(errno));
+        return 0;
+    }
+    return bufsize;
+}
+
 }  // namespace hbthreads

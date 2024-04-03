@@ -33,4 +33,10 @@ bool setSocketMulticastJoin(int sockid, const char *ipaddr, int port,
 //! Sets the reuse flag on a socket
 bool setSocketReuseFlag(int sockid);
 
+//! Sets socket receive buffer size
+bool setSocketReceiveBufferSize(int sockfd, uint32_t bufsize);
+
+//! Retrieves the socket buffer size
+uint32_t getSocketReceiveBufferSize(int sockfd);
+
 }  // namespace hbthreads
