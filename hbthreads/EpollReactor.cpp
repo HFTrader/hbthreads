@@ -1,4 +1,5 @@
 #include "EpollReactor.h"
+#include "SocketUtils.h"
 #include <array>
 // One the hidden great things about epoll is that you do not need to include
 // its header in the class header file like with poll()
@@ -10,6 +11,9 @@ using namespace hbthreads;
 EpollReactor::EpollReactor(MemoryStorage* mem, DateTime timeout) : Reactor(mem) {
     _timeout = timeout;
     _epollfd = ::epoll_create1(0);
+    if (_timeout.nsecs() == 0) {
+        setSocketNonBlocking(_epollfd);
+    }
 }
 
 // Closes the file descriptor if open
