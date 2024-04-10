@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <array>
+#include <algorithm>
 
 namespace hbthreads {
 
@@ -43,31 +44,44 @@ struct Histogram {
         bin.sum2 += value * value;
         bin.count += 1;
     }
-    Stats summary() {
+
+    uint64_t sum() const {
         double sum = 0;
-        uint64_t count = 0;
         for (const Bin& bin : bins) {
             sum += bin.sum;
+        }
+        return sum;
+    }
+
+    uint64_t count() const {
+        uint64_t count = 0;
+        for (const Bin& bin : bins) {
             count += bin.count;
         }
-        if (count == 0) {
-            return {};
-        }
-        uint64_t totalcount = count;
-        double totalsum = sum;
-        Stats stats;
-        stats.samples = totalcount;
-        stats.average = totalsum / totalcount;
-        sum = 0;
-        count = 0;
+        return count;
+    }
+
+    double percentile(double pct) {
+        uint64_t totalcount = count();
+        double sum = 0;
+        uint64_t counter = 0;
+        double target = (pct / 100) * totalcount;
         for (size_t j = 0; j < bins.size(); ++j) {
             const Bin& bin(bins[j]);
-            count += bin.count;
-            if (count >= totalcount / 2) {
-                stats.median = bin.sum / bin.count;
-                break;
+            counter += bin.count;
+            if (counter >= target) {
+                return bin.sum / bin.count;
             }
         }
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    Stats summary() {
+        uint64_t n = count();
+        if (n == 0) return {};
+        Stats stats;
+        stats.samples = n;
+        stats.average = sum() / n;
+        stats.median = percentile(50);
         return stats;
     }
 };
