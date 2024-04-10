@@ -51,6 +51,7 @@ if ( BUILD_TESTS )
     BufferPrinterUnitTests.cpp
     DateTimeUnitTests.cpp
     EpollReactorUnitTests.cpp
+    EventRateCounterUnitTests.cpp
     ImportedTypesUnitTests.cpp
     IntrusiveIndexListUnitTests.cpp
     LightThreadUnitTests.cpp
