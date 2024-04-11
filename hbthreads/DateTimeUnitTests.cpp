@@ -135,3 +135,20 @@ TEST(DateTime, round_edges) {
         }
     }
 }
+
+TEST(DateTime, advance) {
+    DateTime now = DateTime::nsecs(100);
+    DateTime interval = DateTime::nsecs(100);
+    EXPECT_FALSE(now.advance(DateTime::nsecs(50), interval));
+    EXPECT_FALSE(now.advance(DateTime::nsecs(99), interval));
+    EXPECT_TRUE(now.advance(DateTime::nsecs(100), interval));
+    EXPECT_EQ(now, DateTime::nsecs(200));
+    EXPECT_FALSE(now.advance(DateTime::nsecs(150), interval));
+    EXPECT_FALSE(now.advance(DateTime::nsecs(199), interval));
+    EXPECT_TRUE(now.advance(DateTime::nsecs(200), interval));
+    EXPECT_EQ(now, DateTime::nsecs(300));
+    EXPECT_TRUE(now.advance(DateTime::nsecs(350), interval));
+    EXPECT_EQ(now, DateTime::nsecs(400));
+    EXPECT_TRUE(now.advance(DateTime::nsecs(500), interval));
+    EXPECT_EQ(now, DateTime::nsecs(600));
+}

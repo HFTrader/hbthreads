@@ -123,9 +123,27 @@ struct DateTime {
     inline DateTime operator+(DateTime rhs) const {
         return DateTime(epochns + rhs.epochns);
     }
+    //! Addition
+    inline DateTime& operator+=(DateTime rhs) {
+        epochns += rhs.epochns;
+        return *this;
+    }
+    //! Addition
+    inline DateTime& operator-=(DateTime rhs) {
+        epochns -= rhs.epochns;
+        return *this;
+    }
     //! Unary negation
     inline DateTime operator-() const {
         return DateTime(-epochns);
+    }
+    //! Multiplication operator
+    inline DateTime operator*(int64_t value) {
+        return DateTime(epochns * value);
+    }
+    //! Multiplication operator
+    friend inline DateTime operator*(int64_t value, DateTime time) {
+        return DateTime(time.epochns * value);
     }
     //! Binary less
     inline bool operator<(DateTime rhs) const {
@@ -154,9 +172,12 @@ struct DateTime {
         return DateTime(0);
     }
 
-    //! Removes the time zone offset (full half hours)
-    //! from this interval
+    //! Rounds this time object
     DateTime round(DateTime interval) const;
+
+    //! Advance to a given time rounded by an interval
+    //! Returns true if the time changed
+    bool advance(DateTime time, DateTime interval);
 
     //! Returns the current time in epoch/UTC
     enum class ClockType : uint8_t { RealTime = 1, Monotonic = 2 };
@@ -187,7 +208,7 @@ private:
     }
     //! All this boilerplate for me? Awwww
     int64_t epochns;
-};
+};  // namespace hbthreads
 
 std::ostream& operator<<(std::ostream& out, const DateTime date);
 

@@ -100,6 +100,18 @@ DateTime DateTime::round(DateTime interval) const {
     return DateTime(ns);
 }
 
+bool DateTime::advance(DateTime time, DateTime interval) {
+    if (time.epochns < epochns) {
+        return false;
+    }
+    epochns += interval.epochns;
+    if (time.epochns >= epochns) {
+        auto num_intervals = (time.epochns) / interval.epochns + 1;
+        epochns = num_intervals * interval.epochns;
+    }
+    return true;
+}
+
 int64_t DateTime::YYYYMMDD() const {
     int64_t date = epochns / NANOS_IN_DAY;
     return YMD_FROM_EPOCH[date].yyyymmdd;
