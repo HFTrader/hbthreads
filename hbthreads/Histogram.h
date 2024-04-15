@@ -63,7 +63,6 @@ struct Histogram {
 
     double percentile(double pct) {
         uint64_t totalcount = count();
-        double sum = 0;
         uint64_t counter = 0;
         double target = (pct / 100) * totalcount;
         for (size_t j = 0; j < bins.size(); ++j) {
