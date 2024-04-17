@@ -201,4 +201,15 @@ uint32_t getSocketReceiveBufferSize(int sockfd) {
     return bufsize;
 }
 
+bool setSocketMulticastTTL(int sockid, int ttl) {
+    // TTL
+    int res = setsockopt(sockid, SOL_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
+    if (res < 0) {
+        fprintf(stderr, "setSocketTTL(): setsockopt(IP_MULTICAST_TTL): %s\n",
+                strerror(errno));
+        return false;
+    }
+    return true;
+}
+
 }  // namespace hbthreads
