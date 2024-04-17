@@ -36,8 +36,10 @@ int createAndBindTCPSocket(const char *address, int port) {
 
     // Filling server information
     servaddr.sin_family = AF_INET;  // IPv4
-    servaddr.sin_addr.s_addr = inet_addr(address);
     servaddr.sin_port = htons(port);
+    if (address != nullptr) {
+        parseIPAddress(address, &servaddr.sin_addr);
+    }
 
     int flags = 1;
     if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &flags, sizeof(flags)) < 0)
@@ -67,8 +69,11 @@ bool bindSocket(int fd, const char *address, int port) {
 
     // Filling server information
     servaddr.sin_family = AF_INET;  // IPv4
-    servaddr.sin_addr.s_addr = address == nullptr ? INADDR_ANY : inet_addr(address);
+    servaddr.sin_addr.s_addr = INADDR_ANY;
     servaddr.sin_port = htons(port);
+    if (address != nullptr) {
+        parseIPAddress(address, &servaddr.sin_addr);
+    }
 
     // Bind the socket with the server address
     if (bind(fd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
