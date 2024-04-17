@@ -91,6 +91,10 @@ struct DateTime {
     std::int64_t nsecs() const {
         return epochns;
     }
+    //! Returns the total number of seconds as double
+    double total_seconds() const {
+        return double(epochns) / NANOS_IN_SECOND;
+    }
     //! Returns the number of seconds
     std::int64_t secs() const {
         return epochns / NANOS_IN_SECOND;
