@@ -33,12 +33,18 @@ struct Histogram {
     std::array<Bin, N> bins;
     double minimum;
     double maximum;
+    double minvalue;
+    double maxvalue;
     Histogram(double min_, double max_) {
         minimum = min_;
         maximum = max_;
+        minvalue = std::numeric_limits<double>::max();
+        maxvalue = std::numeric_limits<double>::min();
     }
     void add(double value) {
-        long kbin = lrint(((value - minimum) / (maximum - minimum)) * N);
+        if (value < minvalue) minvalue = value;
+        if (value > maxvalue) maxvalue = value;
+        long kbin = long(((value - minimum) / (maximum - minimum)) * N);
         if (kbin < 0) kbin = 0;
         if (kbin >= (long)bins.size()) kbin = bins.size() - 1;
         Bin& bin(bins[kbin]);
