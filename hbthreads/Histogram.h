@@ -35,12 +35,22 @@ struct Histogram {
     double maximum;
     double minvalue;
     double maxvalue;
+
     Histogram(double min_, double max_) {
         minimum = min_;
         maximum = max_;
+        reset();
+    }
+
+    void reset() {
         minvalue = std::numeric_limits<double>::max();
         maxvalue = std::numeric_limits<double>::min();
+        for (auto& bin : bins) {
+            bin.sum = bin.sum2 = 0;
+            bin.count = 0;
+        }
     }
+
     void add(double value) {
         if (value < minvalue) minvalue = value;
         if (value > maxvalue) maxvalue = value;
