@@ -32,16 +32,16 @@ struct DateTime {
     static constexpr std::int64_t NANOS_IN_HOUR = 3600 * NANOS_IN_SECOND;
 
     //! Zero it
-    DateTime() : epochns(0) {
+    constexpr DateTime() : epochns(0) {
     }
 
     //! Returns the date part of the object
-    DateTime date() const {
+    constexpr DateTime date() const {
         return DateTime(epochns - (epochns % NANOS_IN_DAY));
     }
 
     //! Returns the time part of the object
-    DateTime time() const {
+    constexpr DateTime time() const {
         return DateTime(epochns % NANOS_IN_DAY);
     }
 
@@ -52,67 +52,67 @@ struct DateTime {
     static DateTime fromDate(int year, int month = 1, int day = 1);
 
     //! Construct a DateTime interval from days
-    static DateTime days(int64_t days) {
+    static constexpr DateTime days(int64_t days) {
         return DateTime(days * NANOS_IN_DAY);
     }
     //! Construct a DateTime interval from hours
-    static DateTime hours(int64_t hrs) {
+    static constexpr DateTime hours(int64_t hrs) {
         return DateTime::secs(hrs * 3600);
     }
     //! Construct a DateTime interval from minutes
-    static DateTime minutes(int64_t mins) {
+    static constexpr DateTime minutes(int64_t mins) {
         return DateTime::secs(60 * mins);
     }
     //! Construct a Datetime from seconds
-    static DateTime secs(int64_t s) {
+    static constexpr DateTime secs(int64_t s) {
         return DateTime(s * NANOS_IN_SECOND);
     }
     //! Construct a Datetime from milliseconds
-    static DateTime msecs(int64_t ms) {
+    static constexpr DateTime msecs(int64_t ms) {
         return DateTime(ms * MICROS_IN_SECOND);
     }
     //! Construct a Datetime from microseconds
-    static DateTime usecs(int64_t us) {
+    static constexpr DateTime usecs(int64_t us) {
         return DateTime(us * MILLIS_IN_SECOND);
     }
     //! Construct a Datetime from nanoseconds
-    static DateTime nsecs(int64_t ns) {
+    static constexpr DateTime nsecs(int64_t ns) {
         return DateTime(ns);
     }
     //! Returns the number of entire milliseconds
-    std::int64_t msecs() const {
+    constexpr std::int64_t msecs() const {
         return epochns / 1000000LL;
     }
     //! Returns the number of entire microseconds
-    std::int64_t usecs() const {
+    constexpr std::int64_t usecs() const {
         return epochns / 1000LL;
     }
     //! Returns the number of nanoseconds
-    std::int64_t nsecs() const {
+    constexpr std::int64_t nsecs() const {
         return epochns;
     }
     //! Returns the total number of seconds as double
-    double total_seconds() const {
+    constexpr double total_seconds() const {
         return double(epochns) / NANOS_IN_SECOND;
     }
     //! Returns the number of seconds
-    std::int64_t secs() const {
+    constexpr std::int64_t secs() const {
         return epochns / NANOS_IN_SECOND;
     }
     //! Return the total number of days in this object
-    std::int64_t days() const {
+    constexpr std::int64_t days() const {
         return epochns / NANOS_IN_DAY;
     }
     //! Return the total number of minutes in this object
-    std::int64_t minutes() const {
+    constexpr std::int64_t minutes() const {
         return epochns / NANOS_IN_MINUTE;
     }
     //! Return the total number of hours in this object
-    std::int64_t hours() const {
+    constexpr std::int64_t hours() const {
         return epochns / NANOS_IN_HOUR;
     }
     //! Returns the nanoseconds part of the time
-    std::int64_t nanos() const {
+    constexpr std::int64_t nanos() const {
         return epochns % NANOS_IN_SECOND;
     }
 
@@ -120,68 +120,77 @@ struct DateTime {
     //! @{
 
     //! Binary subtraction
-    inline DateTime operator-(DateTime rhs) const {
+    constexpr inline DateTime operator-(DateTime rhs) const {
         return DateTime(epochns - rhs.epochns);
     }
     //! Binary addition
-    inline DateTime operator+(DateTime rhs) const {
+    constexpr inline DateTime operator+(DateTime rhs) const {
         return DateTime(epochns + rhs.epochns);
     }
     //! Addition
-    inline DateTime& operator+=(DateTime rhs) {
+    constexpr inline DateTime& operator+=(DateTime rhs) {
         epochns += rhs.epochns;
         return *this;
     }
     //! Addition
-    inline DateTime& operator-=(DateTime rhs) {
+    constexpr inline DateTime& operator-=(DateTime rhs) {
         epochns -= rhs.epochns;
         return *this;
     }
     //! Unary negation
-    inline DateTime operator-() const {
+    constexpr inline DateTime operator-() const {
         return DateTime(-epochns);
     }
     //! Multiplication operator
-    inline DateTime operator*(int64_t value) {
+    constexpr inline DateTime operator*(int64_t value) {
         return DateTime(epochns * value);
     }
     //! Multiplication operator
-    friend inline DateTime operator*(int64_t value, DateTime time) {
+    friend constexpr inline DateTime operator*(int64_t value, DateTime time) {
         return DateTime(time.epochns * value);
     }
     //! Binary less
-    inline bool operator<(DateTime rhs) const {
+    constexpr inline bool operator<(DateTime rhs) const {
         return epochns < rhs.epochns;
     }
     //! Binary greater
-    inline bool operator>(DateTime rhs) const {
+    constexpr inline bool operator>(DateTime rhs) const {
         return epochns > rhs.epochns;
     }
     //! Binary less or equal
-    inline bool operator<=(DateTime rhs) const {
+    constexpr inline bool operator<=(DateTime rhs) const {
         return epochns <= rhs.epochns;
     }
     //! Binary greater or equal
-    inline bool operator>=(DateTime rhs) const {
+    constexpr inline bool operator>=(DateTime rhs) const {
         return epochns >= rhs.epochns;
     }
     //! Binary equal
-    inline bool operator==(DateTime rhs) const {
+    constexpr inline bool operator==(DateTime rhs) const {
         return epochns == rhs.epochns;
     }
     //! @}
 
     //! Returns a zero interval
-    static DateTime zero() {
+    constexpr static DateTime zero() {
         return DateTime(0);
     }
 
     //! Rounds this time object
     DateTime round(DateTime interval) const;
 
+    //! Rounds this time object
+    template <int64_t INTERVAL_NSECS>
+    constexpr DateTime round() const;
+
     //! Advance to a given time rounded by an interval
     //! Returns true if the time changed
     bool advance(DateTime time, DateTime interval);
+
+    //! Advance to a given time rounded by an interval
+    //! Returns true if the time changed
+    template <int64_t INTERVAL_NSECS>
+    constexpr bool advance(DateTime time);
 
     //! Returns the current time in epoch/UTC
     enum class ClockType : uint8_t { RealTime = 1, Monotonic = 2 };
@@ -208,7 +217,7 @@ struct DateTime {
 private:
     //! Force user to use the static methods otherwise they will
     //! use it wrong, believe me
-    explicit DateTime(int64_t ns) : epochns(ns) {
+    explicit constexpr DateTime(int64_t ns) : epochns(ns) {
     }
     //! All this boilerplate for me? Awwww
     int64_t epochns;
@@ -216,4 +225,27 @@ private:
 
 std::ostream& operator<<(std::ostream& out, const DateTime date);
 
+template <int64_t INTERVAL_NSECS>
+constexpr DateTime DateTime::round() const {
+    int64_t rem = epochns % INTERVAL_NSECS;
+    if (rem >= INTERVAL_NSECS / 2) {
+        rem -= INTERVAL_NSECS;
+    } else if (rem <= -INTERVAL_NSECS / 2) {
+        rem += INTERVAL_NSECS;
+    }
+    return DateTime(rem);
+}
+
+template <int64_t INTERVAL_NSECS>
+constexpr bool DateTime::advance(DateTime time) {
+    if (time.epochns < epochns) {
+        return false;
+    }
+    epochns += INTERVAL_NSECS;
+    if (time.epochns >= epochns) {
+        auto num_intervals = (time.epochns) / INTERVAL_NSECS + 1;
+        epochns = num_intervals * INTERVAL_NSECS;
+    }
+    return true;
+}
 }  // namespace hbthreads

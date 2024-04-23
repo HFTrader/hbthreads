@@ -152,3 +152,20 @@ TEST(DateTime, advance) {
     EXPECT_TRUE(now.advance(DateTime::nsecs(500), interval));
     EXPECT_EQ(now, DateTime::nsecs(600));
 }
+
+TEST(DateTime, advance_templated) {
+    DateTime now = DateTime::nsecs(100);
+    constexpr auto INTERVAL = DateTime::nsecs(100).nsecs();
+    EXPECT_FALSE(now.advance<INTERVAL>(DateTime::nsecs(50)));
+    EXPECT_FALSE(now.advance<INTERVAL>(DateTime::nsecs(99)));
+    EXPECT_TRUE(now.advance<INTERVAL>(DateTime::nsecs(100)));
+    EXPECT_EQ(now, DateTime::nsecs(200));
+    EXPECT_FALSE(now.advance<INTERVAL>(DateTime::nsecs(150)));
+    EXPECT_FALSE(now.advance<INTERVAL>(DateTime::nsecs(199)));
+    EXPECT_TRUE(now.advance<INTERVAL>(DateTime::nsecs(200)));
+    EXPECT_EQ(now, DateTime::nsecs(300));
+    EXPECT_TRUE(now.advance<INTERVAL>(DateTime::nsecs(350)));
+    EXPECT_EQ(now, DateTime::nsecs(400));
+    EXPECT_TRUE(now.advance<INTERVAL>(DateTime::nsecs(500)));
+    EXPECT_EQ(now, DateTime::nsecs(600));
+}
