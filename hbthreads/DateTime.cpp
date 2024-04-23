@@ -91,13 +91,11 @@ DateTime DateTime::round(DateTime interval) const {
     int64_t ns = epochns;
     int64_t rem = ns % intns;
     if (rem >= intns / 2) {
-        ns = ns - rem + intns;
-    } else if (rem >= -intns / 2) {
-        ns = ns - rem;
-    } else {
-        ns = ns - rem - intns;
+        rem -= intns;
+    } else if (rem <= -intns / 2) {
+        rem += intns;
     }
-    return DateTime(ns);
+    return DateTime(rem);
 }
 
 bool DateTime::advance(DateTime time, DateTime interval) {
