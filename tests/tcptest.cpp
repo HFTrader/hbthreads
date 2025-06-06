@@ -6,21 +6,18 @@
 // However in contrast with other platforms we will show
 // how simple the programming of the downstream side becomes
 // with the use of coroutines
-// Live Stream: https://youtu.be/ZreWGHvLAmc
+// Live Stream: https://youtu.be/ZreWGHvLAmc3
 
 #include "EpollReactor.h"
 #include "MallocHooks.h"
 #include "Timer.h"
 #include "SocketUtils.h"
 
-#include <iostream>
-#include <array>
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <string.h>
+#include <cstring>
 
 using namespace hbthreads;
 
@@ -69,6 +66,7 @@ public:
 
             // First case, this is about handling connect requests
             if (ev->fd == server_fd) {
+                usleep( 1000000 );
                 struct sockaddr_in clientaddr;
                 memset(&clientaddr, 0, sizeof(clientaddr));
 
@@ -147,6 +145,8 @@ public:
             if (res == 0) {
                 printf("Socket connected\n");
                 break;
+            } else {
+                printf( "Waiting for socket to connect...\n");
             }
 
             // As the socket is non-blocking, it will return EINPROGRESS
