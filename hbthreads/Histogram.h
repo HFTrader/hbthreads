@@ -54,9 +54,16 @@ struct Histogram {
     void add(double value) {
         if (value < minvalue) minvalue = value;
         if (value > maxvalue) maxvalue = value;
-        long kbin = long(((value - minimum) / (maximum - minimum)) * N);
-        if (kbin < 0) kbin = 0;
-        if (kbin >= (long)bins.size()) kbin = bins.size() - 1;
+
+        // Handle edge case where minimum == maximum
+        long kbin = 0;
+        if (maximum > minimum) {
+            double normalized = (value - minimum) / (maximum - minimum);
+            kbin = long(normalized * N);
+            // Clamp to valid range to prevent overflow
+            kbin = std::max(0L, std::min(kbin, long(bins.size()) - 1));
+        }
+
         Bin& bin(bins[kbin]);
         bin.sum += value;
         bin.sum2 += value * value;

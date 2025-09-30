@@ -53,6 +53,9 @@ public:
     //! We need to embed the size as the first bytes as it is required by
     //! the deallocator call
     void* operator new(size_t size) {
+        // CRITICAL: Ensure storage is initialized before allocating objects
+        assert(storage != nullptr && "Thread-local storage must be initialized before allocating Object subclasses");
+
         // This will catch bad things in debug mode
         assert(size < std::numeric_limits<IntrusiveSizeType>::max());
         assert(_library_counter_size == sizeof(IntrusiveCounterType));

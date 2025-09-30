@@ -95,7 +95,7 @@ DateTime DateTime::round(DateTime interval) const {
     } else if (rem <= -intns / 2) {
         rem += intns;
     }
-    return DateTime(rem);
+    return DateTime(ns - rem);
 }
 
 bool DateTime::advance(DateTime time, DateTime interval) {

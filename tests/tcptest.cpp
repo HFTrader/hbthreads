@@ -66,7 +66,8 @@ public:
 
             // First case, this is about handling connect requests
             if (ev->fd == server_fd) {
-                usleep( 1000000 );
+                // NOTE: usleep removed - was causing 1 second delay in accept path
+                // For production HFT systems, accept should be immediate
                 struct sockaddr_in clientaddr;
                 memset(&clientaddr, 0, sizeof(clientaddr));
 
