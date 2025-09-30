@@ -1,15 +1,16 @@
 
-set( SOURCE_FILES 
+set( SOURCE_FILES
             DateTime.cpp
-             EpollReactor.cpp 
-             LightThread.cpp 
-             MallocHooks.cpp 
-             PollReactor.cpp 
-             Pointer.cpp 
-             Reactor.cpp 
-             SocketUtils.cpp 
+             EpollReactor.cpp
+             LightThread.cpp
+             MallocHooks.cpp
+             PollReactor.cpp
+             Pointer.cpp
+             Reactor.cpp
+             SocketUtils.cpp
              StringUtils.cpp
-             Timer.cpp )
+             Timer.cpp
+             TSC.cpp )
 if ( BUILD_SHARED_LIBS ) 
     add_library( hbthreads SHARED ${SOURCE_FILES} )
 else()
@@ -17,21 +18,22 @@ else()
 endif()
 
 target_link_libraries( hbthreads boost )
-set( HEADERS 
+set( HEADERS
     AsmUtils.h
     BufferPrinter.h
     DateTime.h
-    EpollReactor.h 
+    EpollReactor.h
     Histogram.h
-    ImportedTypes.h    
-    LightThread.h 
-    MallocHooks.h 
-    Pointer.h 
-    PollReactor.h 
-    Reactor.h 
-    SocketUtils.h 
+    ImportedTypes.h
+    LightThread.h
+    MallocHooks.h
+    Pointer.h
+    PollReactor.h
+    Reactor.h
+    SocketUtils.h
     StringUtils.h
-    Timer.h 
+    Timer.h
+    TSC.h
 )
 set_target_properties( hbthreads PROPERTIES PUBLIC_HEADER "${HEADERS}" )
 target_include_directories( hbthreads PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. )

@@ -1,6 +1,5 @@
 #include "LightThread.h"
 #include "Reactor.h"
-#include <iostream>
 
 // You see how easy coroutines are once you strip down all the logic
 // from all these libraries. This is a strip naked implementation

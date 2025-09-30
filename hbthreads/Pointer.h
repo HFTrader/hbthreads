@@ -1,6 +1,5 @@
 #pragma once
 #include "ImportedTypes.h"
-#include <iostream>
 
 namespace hbthreads {
 
@@ -32,7 +31,7 @@ public:
     }
 
     //! Allows intrusive pointers to be used in hashmaps and hashsets
-    bool operator==(const Pointer<T>& rhs) {
+    bool operator==(const Pointer<T>& rhs) const noexcept {
         return this->get() == rhs.get();
     }
 };
@@ -95,12 +94,12 @@ private:
 };
 
 // Required to increment the reference count
-inline void intrusive_ptr_add_ref(ObjectCounter* p) {
+inline void intrusive_ptr_add_ref(ObjectCounter* p) noexcept {
     p->_counter += 1;
 }
 
 // Required to decrement the reference count and deallocate the object
-inline void intrusive_ptr_release(ObjectCounter* p) {
+inline void intrusive_ptr_release(ObjectCounter* p) noexcept {
     if (p->_counter > 1) {
         p->_counter -= 1;
         return;

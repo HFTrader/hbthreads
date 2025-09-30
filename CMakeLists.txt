@@ -41,6 +41,28 @@ endif()
 if ( USE_SMALL_COUNTER )
     add_compile_options( -DUSE_SMALL_COUNTER )
 endif()
+
+#----------------------------------------------------------------------------------------
+# Performance optimization flags for HFT systems
+#----------------------------------------------------------------------------------------
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+    message(STATUS "Enabling HFT performance optimizations for Release build")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        # CPU-specific optimizations (use native instruction set)
+        add_compile_options(-march=native -mtune=native)
+
+        # Link-time optimization for cross-module inlining
+        add_compile_options(-flto)
+        add_link_options(-flto)
+
+        # Aggressive optimization flags
+        add_compile_options(-O3 -ffast-math)
+
+        # Additional optimizations for low latency
+        add_compile_options(-fomit-frame-pointer -finline-functions)
+    endif()
+endif()
+
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/hbthreads )
 

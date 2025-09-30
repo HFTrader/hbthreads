@@ -1,5 +1,4 @@
 #include "PollReactor.h"
-#include <iostream>
 
 using namespace hbthreads;
 

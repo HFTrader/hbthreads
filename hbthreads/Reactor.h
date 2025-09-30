@@ -39,7 +39,7 @@ public:
     void removeThread(LightThread* othread);
 
     //! Returns true if there is at least one single subscription active
-    bool active() const;
+    bool active() const noexcept;
 
 private:
     //! removes all subscriptions to this thread

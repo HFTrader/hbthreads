@@ -1,5 +1,4 @@
 #include "Reactor.h"
-#include <iostream>
 
 using namespace hbthreads;
 
@@ -14,7 +13,7 @@ Reactor::Reactor(MemoryStorage* mem) : _mem(mem), _socket_subs(mem), _thread_sub
 Reactor::~Reactor() {
 }
 
-bool Reactor::active() const {
+bool Reactor::active() const noexcept {
     // no thread subscriptions, not active
     // this is typically used to terminate loops
     return !_socket_subs.empty();
