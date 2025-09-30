@@ -1,3 +1,13 @@
+// MallocHooks.cpp - Memory allocation debugging hooks
+//
+// This file implements debugging hooks for intercepting and logging memory
+// allocation calls (malloc, free, calloc, realloc). When enabled, it provides
+// detailed tracing of memory operations including allocation sizes, addresses,
+// and caller information.
+//
+// The hooks use weak symbol declarations to allow GLIBC to override them
+// during static linking. The caller address is captured using GCC's
+// __builtin_frame_address() for debugging purposes.
 
 #include <malloc.h>
 #include <stdio.h>
@@ -18,9 +28,10 @@ extern "C" void* __libc_realloc(void*, size_t);  // NOLINT(bugprone-reserved-ide
 #pragma weak free
 #pragma weak realloc
 
-//! Set this to "1" in main to get the printouts
+// Set this to "1" in main to get the printouts
 int malloc_hook_active = 0;
 
+// Hook function for malloc calls - logs allocation details and caller
 static void* malloc_hook(size_t size, void* caller) {
     void* result;
     malloc_hook_active = 0;
@@ -32,6 +43,7 @@ static void* malloc_hook(size_t size, void* caller) {
     return result;
 }
 
+// Hook function for free calls - logs deallocation details and caller
 static void free_hook(void* ptr, void* caller) {
     malloc_hook_active = 0;
     BufferPrinter<64> bf;
@@ -41,6 +53,7 @@ static void free_hook(void* ptr, void* caller) {
     malloc_hook_active = 1;
 }
 
+// Hook function for calloc calls - logs allocation details and caller
 static void* calloc_hook(size_t nmemb, size_t size, void* caller) {
     malloc_hook_active = 0;
     void* result = calloc(nmemb, size);
@@ -52,6 +65,7 @@ static void* calloc_hook(size_t nmemb, size_t size, void* caller) {
     return result;
 }
 
+// Hook function for realloc calls - logs reallocation details and caller
 static void* realloc_hook(void* ptr, size_t size, void* caller) {
     malloc_hook_active = 0;
     void* result = realloc(ptr, size);

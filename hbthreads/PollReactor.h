@@ -24,7 +24,11 @@ private:
     //! Called when operations (add,remove,modify) are performed on a socket
     void onSocketOps(int fd, Operation ops) override;
 
-    //! Rebuilds the poll vector `_fds`
+    //! Rebuilds the poll vector `_fds` from the _sockets set.
+    //! This implements a delayed rebuild pattern: multiple socket add/remove
+    //! operations set the _dirty flag, and rebuild() is only called once
+    //! before work(). This batches socket operations and avoids rebuilding
+    //! the dense array required by poll() on every socket change.
     void rebuild();
 
     //! Amount to block waiting for events
@@ -36,10 +40,12 @@ private:
     //! The vector contains the array used in calling `::poll()`
     PollVector _fds;
 
-    //! Keeps track of all existing sockets
+    //! Keeps track of all existing sockets (sparse set)
     FlatSet<int> _sockets;
 
-    //! Shows this needs to be rebuilt
+    //! Dirty flag indicates _fds needs rebuild before next poll().
+    //! This allows batching multiple socket operations without
+    //! rebuilding the dense _fds array on every change.
     bool _dirty;
 };
 

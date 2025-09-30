@@ -1,11 +1,23 @@
+// Pointer.h - Intrusive smart pointer implementation with custom memory management
+//
+// This header provides an intrusive smart pointer system designed for high-performance
+// applications. The Pointer<T> class wraps boost::intrusive_ptr and provides automatic
+// reference counting for objects inheriting from ObjectCounter.
+//
+// Key features:
+// - Zero-overhead reference counting using intrusive counters
+// - Custom memory allocation with size embedding for efficient deallocation
+// - Thread-local memory pool support for allocation performance
+// - Hash map/set support through std::hash specialization
+// - Configurable counter and size types for memory optimization
+
 #pragma once
 #include "ImportedTypes.h"
 
 namespace hbthreads {
 
-// If you are feeling corageous and you want to improve the performance
-// for small objects, set any or both these options ON in your cmake command line
-// $ cmake  -DUSE_SMALL_COUNTER=ON -DUSE_SMALL_SIZE=ON ...
+// Configuration macros for optimizing memory usage in small objects
+// These can be enabled via CMake: -DUSE_SMALL_COUNTER=ON -DUSE_SMALL_SIZE=ON
 #ifdef USE_SMALL_COUNTER
 #define IntrusiveCounterType std::uint16_t
 #else
@@ -18,42 +30,53 @@ namespace hbthreads {
 #define IntrusiveSizeType std::uint32_t
 #endif
 
-// A per-thread memory factory
+// Thread-local memory storage for custom allocation
+// Must be initialized before allocating any ObjectCounter subclasses
 extern __thread MemoryStorage* storage;
 
-//! Your basic intrusive pointer plus hashmap ability
+// Intrusive smart pointer template providing automatic reference counting
+// and hash container support. Objects must inherit from ObjectCounter.
 template <typename T>
 class Pointer : public IntrusivePointer<T> {
 public:
+    // Default constructor - creates a null pointer
     Pointer() {
     }
+
+    // Constructor taking ownership of a raw pointer
+    // The pointed-to object must inherit from ObjectCounter
     Pointer(T* ptr) : IntrusivePointer<T>(ptr) {
     }
 
-    //! Allows intrusive pointers to be used in hashmaps and hashsets
+    // Equality comparison for use in containers
+    // Compares the underlying raw pointers for identity
     bool operator==(const Pointer<T>& rhs) const noexcept {
         return this->get() == rhs.get();
     }
 };
 
-//! A base class that offers the required object counter for intrusive pointers
+// Base class providing intrusive reference counting functionality
+// All objects managed by Pointer<T> must inherit from this class.
+// Uses custom operator new/delete with size embedding for efficient deallocation.
 class ObjectCounter {
 protected:
-    //! Starts with counter zero
-    //! We dont want anyone to instantiate objects of this class so we make it protected
+    // Protected constructor prevents direct instantiation
+    // Initializes reference counter to 0
     ObjectCounter() : _counter(0) {
     }
 
 public:
-    virtual ~ObjectCounter() {
+    // Virtual destructor for polymorphic deletion
+    virtual ~ObjectCounter() noexcept {
     }
 
-    //! Override operator new to use our polymorphic allocator chain
-    //! We need to embed the size as the first bytes as it is required by
-    //! the deallocator call
+    // Custom operator new using thread-local memory storage
+    // Embeds allocation size before the returned pointer for deallocation
     void* operator new(size_t size) {
         // CRITICAL: Ensure storage is initialized before allocating objects
-        assert(storage != nullptr && "Thread-local storage must be initialized before allocating Object subclasses");
+        assert(storage != nullptr &&
+               "Thread-local storage must be initialized before allocating Object "
+               "subclasses");
 
         // This will catch bad things in debug mode
         assert(size < std::numeric_limits<IntrusiveSizeType>::max());
@@ -68,8 +91,9 @@ public:
         return ptr + sizeof(IntrusiveSizeType);
     }
 
-    //! Override operator delete to deallocate using our polymorphic allocator
-    void operator delete(void* p) {
+    // Custom operator delete for deallocation
+    // Retrieves embedded size and calls storage deallocator
+    void operator delete(void* p) noexcept {
         // Gets pointer to the original space
         uint8_t* ptr = ((uint8_t*)p) - sizeof(IntrusiveSizeType);
         // Retrieves the size
@@ -79,26 +103,26 @@ public:
     }
 
 private:
-    //! Makes this call friendly as it will have to access private _counter
+    // Friend functions for boost::intrusive_ptr reference counting
     friend void intrusive_ptr_add_ref(ObjectCounter*);
 
-    //! Makes this call friendly as it will have to access private _counter
+    // Friend functions for boost::intrusive_ptr reference counting
     friend void intrusive_ptr_release(ObjectCounter*);
 
-    //! The number of references to this object
+    // Reference counter for intrusive pointer management
     IntrusiveCounterType _counter;
 
-    //! Sanity checks
+    // Static sanity check variables
     static std::uint32_t _library_counter_size;
     static std::uint32_t _library_chunk_size;
 };
 
-// Required to increment the reference count
+// Boost intrusive_ptr support function - increments reference count
 inline void intrusive_ptr_add_ref(ObjectCounter* p) noexcept {
     p->_counter += 1;
 }
 
-// Required to decrement the reference count and deallocate the object
+// Boost intrusive_ptr support function - decrements reference count and deletes when 0
 inline void intrusive_ptr_release(ObjectCounter* p) noexcept {
     if (p->_counter > 1) {
         p->_counter -= 1;
@@ -107,12 +131,10 @@ inline void intrusive_ptr_release(ObjectCounter* p) noexcept {
     delete p;
 }
 
-//! The intent with the virtual keyword is to avoid the "diamond problem"
-//! https://www.makeuseof.com/what-is-diamond-problem-in-cpp/
-//! if you do not ever have this problem you could consider using ObjectCounter
-//! as a base class
+// Concrete base class for objects managed by intrusive pointers
+// Uses virtual inheritance to prevent diamond problem in multiple inheritance scenarios
 class Object : public virtual ObjectCounter {
-    //! Inherit constructors if any
+    // Inherit constructors from ObjectCounter
     using ObjectCounter::ObjectCounter;
 };
 
@@ -120,13 +142,12 @@ class Object : public virtual ObjectCounter {
 
 namespace std {
 
-/**
- * Allows intrusive pointers to be keys in sets and maps
- */
+// Hash specialization for Pointer<T> to enable use as keys in unordered containers
+// Uses pointer identity for hashing (not object content)
 template <typename T>
 struct hash<hbthreads::Pointer<T>> {
     typedef std::size_t result_type;
-    std::size_t operator()(const hbthreads::Pointer<T>& rhs) const {
+    std::size_t operator()(const hbthreads::Pointer<T>& rhs) const noexcept {
         return reinterpret_cast<std::size_t>(rhs.get());
     }
 };

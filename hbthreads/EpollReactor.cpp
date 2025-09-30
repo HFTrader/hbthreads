@@ -10,6 +10,8 @@ using namespace hbthreads;
 // Passes the memory storage down to the Reactor base
 EpollReactor::EpollReactor(MemoryStorage* mem, DateTime timeout, int max_events)
     : Reactor(mem) {
+    assert(mem != nullptr && "MemoryStorage must not be null");
+    assert(max_events > 0 && "max_events must be positive");
     _timeout = timeout;
     _max_events = max_events;
     _epollfd = ::epoll_create1(0);

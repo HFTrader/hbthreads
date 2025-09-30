@@ -7,6 +7,7 @@ using namespace hbthreads;
 // Notice that the boost::container::flat* containers do not accept a memory
 // Resource but an allocator so it is implicitly declared
 Reactor::Reactor(MemoryStorage* mem) : _mem(mem), _socket_subs(mem), _thread_subs(mem) {
+    assert(mem != nullptr && "MemoryStorage must not be null");
 }
 
 // All resources removed automagically
@@ -20,6 +21,9 @@ bool Reactor::active() const noexcept {
 }
 
 void Reactor::monitor(int fd, LightThread* thread) {
+    assert(fd >= 0 && "File descriptor must be valid");
+    assert(thread != nullptr && "Thread must not be null");
+
     // Notify if this is the first socket we know about
     SocketSubscriberSet::const_iterator is =
         _socket_subs.lower_bound(Subscription{fd, nullptr});
@@ -34,10 +38,12 @@ void Reactor::monitor(int fd, LightThread* thread) {
 }
 
 void Reactor::removeSocket(int fd) {
+    assert(fd >= 0 && "File descriptor must be valid");
     removeSubscriptions(fd);
 }
 
 void Reactor::removeSubscriptions(int fd) {
+    assert(fd >= 0 && "File descriptor must be valid");
     // Get the first subscription for this file descriptor
     SocketSubscriberSet::const_iterator first =
         _socket_subs.lower_bound(Subscription{fd, nullptr});
@@ -53,6 +59,7 @@ void Reactor::removeSubscriptions(int fd) {
 }
 
 void Reactor::removeSubscriptions(LightThread* th) {
+    assert(th != nullptr && "Thread must not be null");
     // Get the first subscription for this thread
     ThreadSubscriptionSet::const_iterator first =
         _thread_subs.lower_bound(Subscription{-1, th});
@@ -87,6 +94,7 @@ void Reactor::removeSubscriptions(LightThread* th) {
 }
 
 void Reactor::notifyEvent(int fd, EventType type) {
+    assert(fd >= 0 && "File descriptor must be valid");
     Event event;
     event.type = type;
     event.fd = fd;

@@ -80,3 +80,85 @@ TEST(Timer, Start) {
         }
     }
 }
+
+TEST(Timer, Stop) {
+    Timer timer;
+    timer.start(DateTime::msecs(10));
+
+    // Let it fire once
+    while (timer.check() == 0) {}
+
+    // Stop the timer
+    EXPECT_TRUE(timer.stop());
+
+    // Wait a bit and verify no more events
+    usleep(20000);  // 20ms
+    EXPECT_EQ(timer.check(), 0);
+}
+
+TEST(Timer, OneShot) {
+    Timer timer;
+    DateTime start_time = DateTime::now();
+    DateTime fire_time = start_time + DateTime::msecs(50);
+
+    EXPECT_TRUE(timer.oneShot(fire_time));
+
+    // Wait for the event
+    DateTime now = DateTime::now();
+    while (now < fire_time + DateTime::msecs(10)) {
+        if (timer.check() > 0) {
+            break;
+        }
+        now = DateTime::now();
+    }
+
+    // Verify it fired once
+    int64_t elapsed = (now - start_time).msecs();
+    EXPECT_GE(elapsed, 45);
+    EXPECT_LE(elapsed, 60);
+
+    // Wait and verify it doesn't fire again
+    usleep(50000);  // 50ms
+    EXPECT_EQ(timer.check(), 0);
+}
+
+TEST(Timer, Restart) {
+    Timer timer;
+
+    // Start with 10ms interval
+    timer.start(DateTime::msecs(10));
+    while (timer.check() == 0) {}
+
+    // Restart with 20ms interval
+    timer.start(DateTime::msecs(20));
+    DateTime start = DateTime::now();
+    while (timer.check() == 0) {}
+    DateTime end = DateTime::now();
+
+    int64_t elapsed = (end - start).msecs();
+    EXPECT_GE(elapsed, 18);
+    EXPECT_LE(elapsed, 25);
+}
+
+TEST(Timer, MultipleChecks) {
+    Timer timer;
+    timer.start(DateTime::msecs(10));
+
+    // Wait for first event
+    while (timer.check() == 0) {}
+
+    // Check again immediately - should be 0
+    EXPECT_EQ(timer.check(), 0);
+
+    // Wait for second event
+    while (timer.check() == 0) {}
+}
+
+TEST(Timer, ZeroInterval) {
+    Timer timer;
+    // Zero interval should stop the timer
+    EXPECT_TRUE(timer.start(DateTime::zero()));
+
+    usleep(10000);  // 10ms
+    EXPECT_EQ(timer.check(), 0);
+}

@@ -4,11 +4,14 @@ using namespace hbthreads;
 
 PollReactor::PollReactor(MemoryStorage* mem, DateTime timeout)
     : Reactor(mem), _fds(mem), _sockets(mem) {
+    assert(mem != nullptr && "MemoryStorage must not be null");
     _timeout = timeout;
     _dirty = false;
 }
 
 void PollReactor::work() {
+    // Delayed rebuild: Only rebuild when dirty flag is set.
+    // This allows batching multiple monitor()/removeSocket() calls.
     if (_dirty) rebuild();
     if (_fds.empty()) return;
     int nd = ::poll(_fds.data(), _fds.size(), _timeout.msecs());
