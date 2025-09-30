@@ -169,3 +169,53 @@ TEST(DateTime, advance_templated) {
     EXPECT_TRUE(now.advance<INTERVAL>(DateTime::nsecs(500)));
     EXPECT_EQ(now, DateTime::nsecs(600));
 }
+
+// Regression test for DateTime::round() bug fix
+// Bug: returned rem instead of (ns - rem)
+TEST(DateTime, RoundBugRegression) {
+    // Test case that would fail with old bug
+    DateTime time = DateTime::nsecs(1500);  // 1500 nanoseconds
+    DateTime interval = DateTime::nsecs(1000);  // Round to 1000ns
+
+    DateTime rounded = time.round(interval);
+
+    // With bug: would return 500 (the remainder)
+    // Fixed: should return 2000 (rounded up to nearest 1000)
+    EXPECT_EQ(rounded.nsecs(), 2000);
+
+    // Test another case
+    time = DateTime::nsecs(1400);
+    rounded = time.round(interval);
+    // Should round down to 1000
+    EXPECT_EQ(rounded.nsecs(), 1000);
+
+    // Test with larger values
+    time = DateTime::msecs(1250);  // 1.25 seconds
+    interval = DateTime::secs(1);   // Round to 1 second
+    rounded = time.round(interval);
+    // Should round to 1 second (1000ms)
+    EXPECT_EQ(rounded.msecs(), 1000);
+}
+
+// Test the power-of-2 optimization added later
+TEST(DateTime, RoundPowerOfTwo) {
+    // Test power-of-2 intervals (uses fast bit-masking path)
+    std::vector<int64_t> power_of_2_intervals = {
+        1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024,
+        1000, 1000000, 1000000000  // 1μs, 1ms, 1s (common HFT intervals)
+    };
+
+    for (int64_t intns : power_of_2_intervals) {
+        // Skip if not power of 2
+        if ((intns & (intns - 1)) != 0) continue;
+
+        DateTime interval = DateTime::nsecs(intns);
+        DateTime time = DateTime::nsecs(intns + intns / 4);  // 1.25 * interval
+
+        DateTime rounded = time.round(interval);
+
+        // Should round to nearest interval
+        int64_t expected = intns;  // Rounds down (0.25 < 0.5)
+        EXPECT_EQ(rounded.nsecs(), expected);
+    }
+}
