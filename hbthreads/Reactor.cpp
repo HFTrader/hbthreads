@@ -58,27 +58,33 @@ void Reactor::removeSubscriptions(LightThread* th) {
     ThreadSubscriptionSet::const_iterator first =
         _thread_subs.lower_bound(Subscription{-1, th});
 
+    // Track which FDs had their last subscription removed
+    // Use a small inline set to avoid allocation for common case
+    FlatSet<int> fds_to_remove(_mem);
+
     // Iterate until the end of the set or until the thread in the iterator
     // is a different one
     ThreadSubscriptionSet::const_iterator it = first;
     for (; (it != _thread_subs.end()) && (it->thread.get() == th); ++it) {
         int fd = it->fd;
-        SocketSubscriberSet::iterator is = _socket_subs.find(Subscription{fd, th});
-        if (is != _socket_subs.end()) {
-            // This should return the next subscription in socket order
-            is = _socket_subs.erase(is);
+        // Remove from socket subscriptions (we know it exists)
+        _socket_subs.erase(Subscription{fd, th});
 
-            // Find if this is the last socket and notify
-            // It would be cleaner to just do another search but this is faster
-            bool found = ((is != _socket_subs.end()) && (is->fd == fd)) ||
-                         ((is != _socket_subs.begin()) && ((is - 1)->fd == fd));
-            if (!found) {
-                onSocketOps(it->fd, Operation::Removed);
-            }
+        // Check if this was the last subscription for this FD
+        SocketSubscriberSet::const_iterator next_sub =
+            _socket_subs.lower_bound(Subscription{fd, nullptr});
+        if ((next_sub == _socket_subs.end()) || (next_sub->fd != fd)) {
+            // No more subscriptions for this FD
+            fds_to_remove.insert(fd);
         }
     }
-    // Erase the entire range
+    // Erase the entire range from thread subscriptions
     _thread_subs.erase(first, it);
+
+    // Notify about removed sockets
+    for (int fd : fds_to_remove) {
+        onSocketOps(fd, Operation::Removed);
+    }
 }
 
 void Reactor::notifyEvent(int fd, EventType type) {

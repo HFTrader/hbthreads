@@ -8,8 +8,10 @@
 using namespace hbthreads;
 
 // Passes the memory storage down to the Reactor base
-EpollReactor::EpollReactor(MemoryStorage* mem, DateTime timeout) : Reactor(mem) {
+EpollReactor::EpollReactor(MemoryStorage* mem, DateTime timeout, int max_events)
+    : Reactor(mem) {
     _timeout = timeout;
+    _max_events = max_events;
     _epollfd = ::epoll_create1(0);
     if (_timeout.nsecs() == 0) {
         setSocketNonBlocking(_epollfd);
@@ -25,9 +27,10 @@ EpollReactor::~EpollReactor() {
 bool EpollReactor::work() {
     if (_epollfd < 0) return false;
 
-    // Handles pending events
-    std::array<epoll_event, 16> events;
-    int nd = ::epoll_wait(_epollfd, events.data(), events.size(), _timeout.msecs());
+    // Allocate event buffer on stack (VLA for efficiency)
+    // For production HFT, typical values: 256-1024
+    epoll_event* events = (epoll_event*)alloca(_max_events * sizeof(epoll_event));
+    int nd = ::epoll_wait(_epollfd, events, _max_events, _timeout.msecs());
     if (nd < 0) {
         // This should never happen but it is possible
         perror("EpollReactor::work() on epoll_wait");
@@ -36,7 +39,7 @@ bool EpollReactor::work() {
 
     // If there are events, dispatch them
     for (int j = 0; j < nd; ++j) {
-        const epoll_event& ev(events[j]);
+        const epoll_event& ev = events[j];
         // Notify reads
         if ((ev.events & EPOLLIN) != 0) {
             notifyEvent(ev.data.fd, EventType::SocketRead);

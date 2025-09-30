@@ -89,6 +89,17 @@ DateTime DateTime::round(DateTime interval) const {
     if (intns == 0) return *this;
     if (intns < 0) intns = -intns;
     int64_t ns = epochns;
+
+    // Fast path: power-of-2 intervals (common in trading: 1μs, 1ms, etc.)
+    // Use bit masking instead of expensive division
+    if ((intns & (intns - 1)) == 0) {
+        // intns is a power of 2
+        int64_t half = intns >> 1;
+        int64_t mask = ~(intns - 1);
+        return DateTime((ns + half) & mask);
+    }
+
+    // Fallback: arbitrary intervals require division
     int64_t rem = ns % intns;
     if (rem >= intns / 2) {
         rem -= intns;
