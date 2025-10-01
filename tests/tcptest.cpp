@@ -87,21 +87,20 @@ public:
                 // This is actual data through connections
                 if (ev->type == EventType::SocketRead) {
                     printf("Server::run() Client socket read\n");
-                    // It will be filled with the client information
-                    struct sockaddr_in cliaddr;
-                    memset(&cliaddr, 0, sizeof(cliaddr));
+                    // Receive data from TCP socket
+                    int n = ::recv(ev->fd, (char *)buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
 
-                    // Receive packet
-                    socklen_t len = sizeof(cliaddr);
-                    int n = recvfrom(ev->fd, (char *)buffer, sizeof(buffer) - 1,
-                                     MSG_DONTWAIT, (struct sockaddr *)&cliaddr, &len);
+                    if (n <= 0) {
+                        // Connection closed or error
+                        _reactor->removeSocket(ev->fd);
+                        continue;
+                    }
 
                     // Guarantee that printf() will not overrun the buffer
                     buffer[n] = '\0';
 
                     // Print packet
-                    printf("From(%s:%d): %s\n", inet_ntoa(cliaddr.sin_addr),
-                           (int)ntohs(cliaddr.sin_port), buffer);
+                    printf("Received: %s\n", buffer);
 
                     // If "quit" was received, finish the loop
                     if (::strchr(buffer, 0xFF) != NULL) break;
@@ -161,7 +160,7 @@ public:
             // this is released by the timer event
             Event *ev = wait();
             if (ev->fd == fd) {
-                if ((ev->type != EventType::SocketRead) ||
+                if ((ev->type != EventType::SocketRead) &&
                     (ev->type != EventType::SocketHangup)) {
                     printf("Client::run(): socket error \n");
                     return false;

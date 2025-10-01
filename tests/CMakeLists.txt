@@ -11,7 +11,7 @@ add_test( NAME timertest COMMAND timertest )
 
 add_executable( udptest udptest.cpp  )
 target_link_libraries( udptest hbthreads boost )
-add_test( NAME udptest COMMAND timertest )
+add_test( NAME udptest COMMAND udptest )
 
 add_executable( tcptest tcptest.cpp  )
 target_link_libraries( tcptest hbthreads boost )

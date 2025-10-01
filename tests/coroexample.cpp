@@ -13,7 +13,8 @@ int buy() {
 
 int sell(int amount) {
     if (amount == 0) return 0;
-    return rand() % (amount + 1);
+    int sell_amount = rand() % (amount + 1);
+    return sell_amount > 0 ? sell_amount : 1;  // Ensure we always sell at least 1
 }
 
 static int MAXLOOPS = 5;

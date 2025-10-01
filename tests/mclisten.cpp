@@ -36,13 +36,13 @@ struct MCastListener : public LightThread {
 };
 
 int main(int argc, char* argv[]) {
-    if (argc != 4) {
-        printf("Usage: mclisten <address> <port> [<interface>]\n");
+    if (argc < 3 || argc > 4) {
+        printf("Usage: mclisten <address> <port> [interface]\n");
         return 0;
     }
     const char* mcaddress = argv[1];
     int mcport = ::atoi(argv[2]);
-    const char* interface = argv[3];
+    const char* interface = (argc >= 4) ? argv[3] : nullptr;
 
     // See timertest.cpp for more explanation on these settings
     malloc_hook_active = 0;
