@@ -30,7 +30,7 @@ class Server : public LightThread {
     char buffer[4096];
 
 public:
-    Server(Reactor *reactor, const char *address, int port) : _reactor(reactor) {
+    Server(Reactor* reactor, const char* address, int port) : _reactor(reactor) {
         _address = address;
         _port = port;
     }
@@ -62,7 +62,7 @@ public:
             // Two types of events can come through here:
             // 1. Accept requests through the socket server
             // 2. Data through accepted sockets
-            Event *ev = wait();
+            Event* ev = wait();
 
             // First case, this is about handling connect requests
             if (ev->fd == server_fd) {
@@ -72,7 +72,7 @@ public:
                 memset(&clientaddr, 0, sizeof(clientaddr));
 
                 socklen_t len = sizeof(clientaddr);
-                int client_fd = ::accept(server_fd, (sockaddr *)&clientaddr, &len);
+                int client_fd = ::accept(server_fd, (sockaddr*)&clientaddr, &len);
                 if (client_fd < 0) {
                     perror("Server::run() accept");
                     continue;
@@ -88,7 +88,8 @@ public:
                 if (ev->type == EventType::SocketRead) {
                     printf("Server::run() Client socket read\n");
                     // Receive data from TCP socket
-                    int n = ::recv(ev->fd, (char *)buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
+                    int n =
+                        ::recv(ev->fd, (char*)buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
 
                     if (n <= 0) {
                         // Connection closed or error
@@ -127,7 +128,7 @@ class Client : public LightThread {
     struct sockaddr_in servaddr;  //! server address to send messages to
 
 public:
-    Client(Reactor *reactor, const char *server_address, int server_port)
+    Client(Reactor* reactor, const char* server_address, int server_port)
         : _reactor(reactor) {
         // Filling server information
         memset(&servaddr, 0, sizeof(servaddr));
@@ -141,12 +142,12 @@ public:
         while (true) {
             // Attempt to connect
             // On a 2nd pass this will check that the socket is connected already
-            int res = ::connect(fd, (sockaddr *)&servaddr, sizeof(servaddr));
+            int res = ::connect(fd, (sockaddr*)&servaddr, sizeof(servaddr));
             if (res == 0) {
                 printf("Socket connected\n");
                 break;
             } else {
-                printf( "Waiting for socket to connect...\n");
+                printf("Waiting for socket to connect...\n");
             }
 
             // As the socket is non-blocking, it will return EINPROGRESS
@@ -158,7 +159,7 @@ public:
             }
 
             // this is released by the timer event
-            Event *ev = wait();
+            Event* ev = wait();
             if (ev->fd == fd) {
                 if ((ev->type != EventType::SocketRead) &&
                     (ev->type != EventType::SocketHangup)) {
@@ -201,7 +202,7 @@ public:
         // Here we are connected
         for (int counter = 0; counter < 10; ++counter) {
             // Wait for timer
-            Event *ev = wait();
+            Event* ev = wait();
             assert(ev != nullptr);
 
             // Consume the timer otherwise it will be called again right away
@@ -240,7 +241,7 @@ int main() {
     storage = &buffer;
 
     // Perhaps we should get this from the command line - or not
-    const char *server_address = "127.0.0.1";
+    const char* server_address = "127.0.0.1";
     int server_port = 8080;
     const std::size_t stacksize = 4 * 1024ULL;
 

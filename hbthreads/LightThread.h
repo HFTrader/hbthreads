@@ -22,11 +22,11 @@ namespace hbthreads {
 // Event types that can be delivered to waiting threads
 // Used by reactors to notify threads of I/O readiness or errors
 enum class EventType : uint16_t {
-    NA = 0,              // Not applicable/uninitialized
-    SocketRead = 1,      // Socket has data available for reading
-    SocketWriteable = 2, // Socket is ready for writing (not currently implemented)
-    SocketError = 3,     // Socket error occurred
-    SocketHangup = 4     // Socket connection closed/hung up
+    NA = 0,               // Not applicable/uninitialized
+    SocketRead = 1,       // Socket has data available for reading
+    SocketWriteable = 2,  // Socket is ready for writing (not currently implemented)
+    SocketError = 3,      // Socket error occurred
+    SocketHangup = 4      // Socket connection closed/hung up
 };
 
 // Event structure passed to resumed threads
@@ -40,7 +40,8 @@ struct Event {
 
 // Stack-full coroutine class providing cooperative multitasking
 // This is an abstract base class that must be subclassed to implement the run() method.
-// Threads are managed by a Reactor which handles I/O events and resumes threads accordingly.
+// Threads are managed by a Reactor which handles I/O events and resumes threads
+// accordingly.
 //
 // Thread lifecycle:
 // 1. Create subclass and implement run()
