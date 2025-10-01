@@ -9,9 +9,12 @@ LightThread::LightThread() {
 }
 
 LightThread::~LightThread() {
-    // Deallocate stack
-    StackAllocator sa(_stack_size);
-    sa.deallocate(_stack);
+    // Deallocate stack if it was allocated
+    // Note: No check for running thread - assumes proper lifecycle management
+    if (_stack_size > 0) {
+        StackAllocator sa(_stack_size);
+        sa.deallocate(_stack);
+    }
 }
 
 Event* LightThread::wait() {
@@ -34,32 +37,35 @@ void LightThread::entry(transfer_t ctx) {
     // Starts the virtual loop
     th->run();
 
-    // Once the virtual loop ends, returns zero (null) so the caller is notified
-    // that this thread is done. This is checked in LightThread::resume() below
-    while (true) {
-        th->_ret = jump_fcontext(th->_ret.fctx, 0);
-    }
+    // Once the virtual loop ends, return null to signal thread completion
+    // The infinite loop was removed as it's unnecessary and wasteful
+    th->_ret = jump_fcontext(th->_ret.fctx, nullptr);
 }
 
 bool LightThread::resume(Event* event) {
-    // Will jump back on where the thread left, typically after the
-    // first line in `wait()`
+    // Will jump back to where the thread left, typically after the
+    // first line in wait()
     _ret = jump_fcontext(_ret.fctx, event);
 
-    // Returns false if the thread returns zero. See comments in `entry()` above
-    return (_ret.data != 0);
+    // Returns true if thread yielded (sent non-null data), false if completed (sent null)
+    return (_ret.data != nullptr);
 }
 
 void LightThread::start(size_t stack_size) {
+    // Prevent double initialization
+    if (_stack_size > 0) {
+        return;  // Already started
+    }
+
     _stack_size = stack_size;
-    // This is currently defined as a protected stack allocator in ImportedTypes.h
+
+    // Allocate stack for this thread
     StackAllocator sa(_stack_size);
     _stack = sa.allocate();
 
-    // Assigns the stack and prepares for the jump
+    // Create execution context on the allocated stack
     _ctx = make_fcontext(_stack.sp, _stack.size, LightThread::entry);
 
-    // This will call LightThread::entry() and execute the virtual `run()` call
-    // passing the pointer to this object as a parameter
+    // Jump to the coroutine entry point, passing this object as context
     _ret = jump_fcontext(_ctx, (void*)this);
 }
