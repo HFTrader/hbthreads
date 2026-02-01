@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "hbthreads",
+  "version": "1.0.1",
+  "description": "A coroutine-based reactor library for event-driven programming",
+  "homepage": "https://github.com/HFTrader/hbthreads",
+  "license": "BSL-1.0",
+  "supports": "linux",
+  "dependencies": [
+    {
+      "name": "boost-context",
+      "version>=": "1.74.0"
+    },
+    {
+      "name": "boost-container",
+      "version>=": "1.74.0"
+    },
+    {
+      "name": "boost-fiber",
+      "version>=": "1.74.0"
+    },
+    {
+      "name": "boost-smart-ptr",
+      "version>=": "1.74.0"
+    }
+  ],
+  "features": {
+    "tests": {
+      "description": "Build unit tests",
+      "dependencies": [
+        {
+          "name": "gtest",
+          "version>=": "1.11.0"
+        }
+      ]
+    }
+  }
+}
