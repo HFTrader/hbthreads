@@ -104,10 +104,10 @@ public:
 
 private:
     // Friend functions for boost::intrusive_ptr reference counting
-    friend void intrusive_ptr_add_ref(ObjectCounter*);
+    friend void intrusive_ptr_add_ref(ObjectCounter*) noexcept;
 
     // Friend functions for boost::intrusive_ptr reference counting
-    friend void intrusive_ptr_release(ObjectCounter*);
+    friend void intrusive_ptr_release(ObjectCounter*) noexcept;
 
     // Reference counter for intrusive pointer management
     IntrusiveCounterType _counter;

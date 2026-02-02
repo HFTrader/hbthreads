@@ -33,6 +33,15 @@
           "version>=": "1.11.0"
         }
       ]
+    },
+    "benchmarks": {
+      "description": "Build performance benchmarks",
+      "dependencies": [
+        {
+          "name": "benchmark",
+          "version>=": "1.6.0"
+        }
+      ]
     }
   }
 }

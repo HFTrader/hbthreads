@@ -10,6 +10,7 @@ set( LOCAL_BOOST_LIB_PREFIX "${LOCAL_BOOST_PREFIX}/lib" CACHE PATH "Location of 
 set( LOCAL_BOOST_INCLUDE_PREFIX "${LOCAL_BOOST_PREFIX}/include" CACHE PATH "Location of boost headers")
 set( BUILD_SHARED_LIBS ON CACHE BOOL "Build shared or static libraries" )
 set( BUILD_TESTS ON CACHE BOOL "Build internal unit tests")
+set( BUILD_BENCHMARKS OFF CACHE BOOL "Build performance benchmarks")
 set( CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Default build type" )
 set( CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Exports a database for clang-tidy")
 
@@ -70,14 +71,27 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/hbthreads )
 # Dependencies
 #----------------------------------------------------------------------------------------
 
-# Let's include Google Tests as a downloadable content so we don't have 
+# Let's include Google Tests as a downloadable content so we don't have
 # to force the user to install it in their system
-if ( BUILD_TESTS )
+if ( BUILD_TESTS OR BUILD_BENCHMARKS )
     include(FetchContent)
+endif()
+
+if ( BUILD_TESTS )
     FetchContent_Declare( googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG main )
     FetchContent_MakeAvailable(googletest)
+endif()
+
+# Google Benchmark for performance testing
+if ( BUILD_BENCHMARKS )
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+    FetchContent_Declare( googlebenchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG main )
+    FetchContent_MakeAvailable(googlebenchmark)
 endif()
 
 #----------------------------------------------------------------------------------------
@@ -111,10 +125,10 @@ else()
     # On Ubuntu install with `apt install libboost-all-dev`
     find_package(Boost COMPONENTS context container REQUIRED)
     add_library( boost INTERFACE IMPORTED )
-    set_target_properties( boost PROPERTIES 
+    set_target_properties( boost PROPERTIES
         INTERFACE_LINK_LIBRARIES "pthread;Boost::context;Boost::container"
+        INTERFACE_LINK_OPTIONS "-Wl,--no-as-needed"
     )
-    target_link_options( boost PUBLIC "-Wl,--no-as-needed" )
 endif()
 
 #----------------------------------------------------------------------------------------
@@ -157,4 +171,8 @@ if ( BUILD_TESTS )
         ARCHIVE DESTINATION lib
         PUBLIC_HEADER DESTINATION include/hbthreads
     )
+endif()
+
+if ( BUILD_BENCHMARKS )
+    add_subdirectory(benchmarks)
 endif()

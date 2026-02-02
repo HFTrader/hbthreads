@@ -65,6 +65,7 @@ sudo cmake --install build
 |--------|---------|-------------|
 | `BUILD_SHARED_LIBS` | ON | Build shared library (OFF for static) |
 | `BUILD_TESTS` | ON | Build unit tests |
+| `BUILD_BENCHMARKS` | OFF | Build performance benchmarks (Google Benchmark) |
 | `BUILD_DOCS` | ON | Build Doxygen documentation |
 | `USE_LOCAL_BOOST` | OFF | Use locally compiled Boost (see `build_minimal_boost.sh`) |
 | `HBTHREADS_USES_CLANG_TIDY` | OFF | Enable clang-tidy during compilation |
@@ -128,6 +129,27 @@ int main() {
 ```
 
 See `tests/` directory for more comprehensive examples.
+
+## Benchmarks
+
+Build and run performance benchmarks:
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON
+cmake --build build --parallel
+./build/benchmarks/benchmarks
+```
+
+Filter specific benchmarks:
+```bash
+./build/benchmarks/benchmarks --benchmark_filter=LightThread
+./build/benchmarks/benchmarks --benchmark_filter=Pointer
+./build/benchmarks/benchmarks --benchmark_filter=Reactor
+```
+
+Export results:
+```bash
+./build/benchmarks/benchmarks --benchmark_format=json --benchmark_out=results.json
+```
 
 ## Architecture
 
