@@ -99,14 +99,28 @@ DateTime DateTime::round(DateTime interval) const {
         return DateTime((ns + half) & mask);
     }
 
-    // Fallback: arbitrary intervals require division
-    int64_t rem = ns % intns;
-    if (rem >= intns / 2) {
-        rem -= intns;
-    } else if (rem <= -intns / 2) {
-        rem += intns;
-    }
-    return DateTime(ns - rem);
+    // Fallback: arbitrary intervals require division.
+    //
+    // This must agree with the power-of-2 fast path above, which computes
+    // floor((ns + half) / intns) * intns -- ties round up, toward +infinity,
+    // for negative times as well as positive ones.
+    //
+    // The previous version used the sign-symmetric remainder adjustment below:
+    //     rem = ns % intns;
+    //     if (rem >= intns/2) rem -= intns; else if (rem <= -intns/2) rem += intns;
+    //     return ns - rem;
+    // C++ '%' truncates toward zero, so that rounds ties *away from zero*: a
+    // time exactly half an interval before an epoch boundary rounded down while
+    // its positive mirror rounded up. The same call therefore produced different
+    // rounding depending only on whether the interval happened to be a power of
+    // two -- e.g. round(30min) of -00:15:00 gave -00:30:00 instead of 00:00:00.
+    //
+    // Computing the floored quotient directly keeps both paths identical.
+    const int64_t half = intns / 2;
+    const int64_t shifted = ns + half;
+    int64_t rem = shifted % intns;
+    if (rem < 0) rem += intns;  // floored remainder, unlike C++'s truncated %
+    return DateTime(shifted - rem);
 }
 
 bool DateTime::advance(DateTime time, DateTime interval) {
