@@ -6,6 +6,11 @@
 
 using namespace hbthreads;
 
+// Internal linkage: ReactorUnitTests.cpp defines a different class also named
+// TestThread at file scope, and both link into the same unit_tests binary.
+// Without this the name collision is an ODR violation.
+namespace {
+
 class TestThread : public LightThread {
 public:
     int events_received = 0;
@@ -21,6 +26,8 @@ public:
         }
     }
 };
+
+}  // namespace
 
 class EpollReactorTest : public ::testing::Test {
 protected:

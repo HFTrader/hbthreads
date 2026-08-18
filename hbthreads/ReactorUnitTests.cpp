@@ -6,6 +6,17 @@
 
 using namespace hbthreads;
 
+// Anonymous namespace gives this helper internal linkage.
+//
+// EpollReactorUnitTests.cpp and PollReactorUnitTests.cpp also define a
+// file-scope class named TestThread, and all three link into the same
+// unit_tests binary. Those two use {int, vector, vector} while this one uses
+// {int, EventType, int}, so the name collision was a genuine ODR violation:
+// the linker keeps a single TestThread::run(), and whichever it picked wrote
+// through the wrong member offsets. That is why MonitorAndNotify saw the
+// correct events_received (same offset in both layouts) but last_fd == 0.
+namespace {
+
 // Test thread that counts events
 class TestThread : public LightThread {
 public:
@@ -22,6 +33,8 @@ public:
         }
     }
 };
+
+}  // namespace
 
 class ReactorTest : public ::testing::Test {
 protected:
