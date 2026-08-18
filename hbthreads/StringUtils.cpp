@@ -1,5 +1,6 @@
 #include "StringUtils.h"
 #include <string.h>
+#include <stdio.h>
 
 namespace hbthreads {
 

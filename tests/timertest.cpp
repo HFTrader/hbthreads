@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <array>
+#include <stdio.h>
 
 using namespace hbthreads;
 

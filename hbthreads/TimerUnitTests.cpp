@@ -8,6 +8,7 @@
 #include <sys/statfs.h>
 #include <linux/magic.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 using namespace hbthreads;
 

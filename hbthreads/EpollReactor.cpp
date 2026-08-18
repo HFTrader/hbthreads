@@ -4,6 +4,7 @@
 // One the hidden great things about epoll is that you do not need to include
 // its header in the class header file like with poll()
 #include <sys/epoll.h>
+#include <stdio.h>
 
 using namespace hbthreads;
 

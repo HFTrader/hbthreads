@@ -2,6 +2,9 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdint.h>  // uint16_t/uint32_t/uint64_t used by the operator<< overloads
+#include <string.h>  // strlen, memcpy
+#include <unistd.h>  // ::write
 
 //! Short story - I was tired of segfaults on the malloc_hook because of the non-reentrant
 //! vsprintf() and bit the bullet to create a stream that does not allocate ever

@@ -7,6 +7,7 @@
 #include "Timer.h"
 
 #include <sys/eventfd.h>
+#include <stdio.h>
 
 using namespace hbthreads;
 

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "DateTime.h"
+#include <stdio.h>
 
 using namespace hbthreads;
 

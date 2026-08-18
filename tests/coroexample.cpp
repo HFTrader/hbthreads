@@ -1,5 +1,6 @@
 #include "LightThread.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 using namespace hbthreads;
 

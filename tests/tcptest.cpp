@@ -18,6 +18,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <cstring>
+#include <stdio.h>
 
 using namespace hbthreads;
 
