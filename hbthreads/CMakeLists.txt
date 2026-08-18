@@ -23,8 +23,10 @@ set( HEADERS
     BufferPrinter.h
     DateTime.h
     EpollReactor.h
+    EventRateCounter.h
     Histogram.h
     ImportedTypes.h
+    IntrusiveIndexList.h
     LightThread.h
     MallocHooks.h
     Pointer.h
@@ -54,6 +56,7 @@ if ( BUILD_TESTS )
     DateTimeUnitTests.cpp
     EpollReactorUnitTests.cpp
     EventRateCounterUnitTests.cpp
+    HistogramUnitTests.cpp
     ImportedTypesUnitTests.cpp
     IntrusiveIndexListUnitTests.cpp
     LightThreadUnitTests.cpp
