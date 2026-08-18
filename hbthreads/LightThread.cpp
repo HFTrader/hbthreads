@@ -37,12 +37,25 @@ void LightThread::entry(transfer_t ctx) {
     // Starts the virtual loop
     th->run();
 
+    // Mark completion BEFORE the final jump. This jump is one-way: nothing ever
+    // resumes this context again, so the assignment below never actually
+    // happens and _ret is left pointing into a stack that is about to die.
+    th->_finished = true;
+
     // Once the virtual loop ends, return null to signal thread completion
     // The infinite loop was removed as it's unnecessary and wasteful
     th->_ret = jump_fcontext(th->_ret.fctx, nullptr);
 }
 
 bool LightThread::resume(Event* event) {
+    // A completed coroutine has no context left to jump into -- _ret still
+    // refers to the finished (and possibly deallocated) stack, so resuming it
+    // is undefined behaviour and in practice terminates the process. Callers
+    // legitimately hit this: a Reactor holding several subscriptions for one
+    // thread will resume it once per ready event, and any of those can be the
+    // one that lets run() return. Report completion instead of crashing.
+    if (_finished) return false;
+
     // Will jump back to where the thread left, typically after the
     // first line in wait()
     _ret = jump_fcontext(_ret.fctx, event);

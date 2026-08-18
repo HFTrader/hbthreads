@@ -83,17 +83,36 @@ private:
     // Sets up the coroutine context and calls the virtual run() method
     static void entry(transfer_t t);
 
+    // NOTE: these MUST be initialized here.
+    //
+    // start() guards against double-initialization with `if (_stack_size > 0)
+    // return;` and ~LightThread() frees the stack with `if (_stack_size > 0)`.
+    // With an indeterminate _stack_size, a freshly constructed LightThread that
+    // happens to reuse the heap memory of a destroyed one inherits its old
+    // non-zero size. start() then silently does nothing -- no stack, no context
+    // -- and the first resume() jumps into an uninitialized _ret.fctx and
+    // segfaults inside jump_fcontext. The destructor would likewise free a
+    // garbage _stack.
+    //
+    // It reproduces only when a prior LightThread has already been destroyed,
+    // which is why a test could pass alone and crash as part of a suite.
+
     // Saved execution context for context switching
-    ThreadContext _ctx;
+    ThreadContext _ctx{};
 
     // Return context information for resuming execution
-    ReturnContext _ret;
+    ReturnContext _ret{};
 
     // Allocated stack memory for this thread
-    stack_context _stack;
+    stack_context _stack{};
 
     // Requested stack size (may differ from actual allocated size)
-    size_t _stack_size;
+    size_t _stack_size{0};
+
+    // Set once run() returns. resume() checks this so that resuming a finished
+    // thread is a safe no-op returning false, rather than a jump into a dead
+    // context.
+    bool _finished{false};
 };
 
 }  // namespace hbthreads
