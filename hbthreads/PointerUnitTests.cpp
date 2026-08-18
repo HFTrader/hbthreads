@@ -188,6 +188,17 @@ TEST_F(PointerTest, NestedAllocation) {
 
 // Death test verifying that uninitialized storage causes assertion failure
 TEST(PointerDeathTest, NullStorageCheck) {
+#ifdef NDEBUG
+    // Pointer::operator new guards storage with assert(), which NDEBUG compiles
+    // out. A Release build still dies here -- it dereferences a null storage --
+    // but with no message, so the regex below cannot match. Skip rather than
+    // report a spurious failure.
+    GTEST_SKIP() << "assert() disabled by NDEBUG; no diagnostic to match";
+#else
+    // Restore the global afterwards. ASSERT_DEATH forks, so this assignment
+    // happens in the parent and would otherwise leave storage null for every
+    // later test in this binary.
+    auto* saved = storage;
     storage = nullptr;
     ASSERT_DEATH(
         {
@@ -195,6 +206,8 @@ TEST(PointerDeathTest, NullStorageCheck) {
             (void)obj;
         },
         "storage must be initialized");
+    storage = saved;
+#endif
 }
 
 // Test hash function support for use in unordered containers

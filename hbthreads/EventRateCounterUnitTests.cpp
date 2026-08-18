@@ -63,13 +63,16 @@ TEST(EventRateCounter, SlidingWindow) {
         counter.advance(now);
     }
 
-    // Should have 10 events in 1 second window
-    EXPECT_EQ(counter.count(), 10);
+    // 10 events were added at t+0ms .. t+900ms and the clock now reads t+1000ms.
+    // The ring holds exactly 1s/100ms = 10 slots, so advancing onto slot 10
+    // reuses slot 0: the event added at t+0 is exactly one full expiration
+    // interval old and has therefore expired. 9 remain, not 10.
+    EXPECT_EQ(counter.count(), 9);
 
-    // Advance another 100ms - oldest event should drop off
+    // Advance another 100ms - the next oldest event drops off
     now = now + DateTime::msecs(100);
     counter.advance(now);
-    EXPECT_EQ(counter.count(), 9);
+    EXPECT_EQ(counter.count(), 8);
 }
 
 TEST(EventRateCounter, MultipleAddsBeforeAdvance) {
@@ -115,8 +118,10 @@ TEST(EventRateCounter, HighFrequency) {
         counter.advance(now);
     }
 
-    // Should have 100 events in 100ms window
-    EXPECT_EQ(counter.count(), 100);
+    // Same boundary as SlidingWindow: 100 events at t+0ms .. t+99ms with the
+    // clock at t+100ms. The ring is 100ms/1ms = 100 slots, so the event from
+    // t+0 is exactly one expiration interval old and has expired.
+    EXPECT_EQ(counter.count(), 99);
 
     // Advance past window
     now = now + DateTime::msecs(100);

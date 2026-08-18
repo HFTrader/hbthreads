@@ -87,7 +87,10 @@ TEST_F(LightThreadTest, ContextSwitch) {
     for (int i = 0; i < 10; i++) {
         EXPECT_EQ(thread->counter, i + 1);
         bool result = thread->resume(&event);
-        EXPECT_TRUE(result);
+        // CountingThread::run() loops exactly 10 times, so the 10th resume lets
+        // run() return. resume() then reports completion by yielding null --
+        // returning false is the documented contract, not a failure.
+        EXPECT_EQ(result, i < 9) << "resume() at i=" << i;
     }
 
     EXPECT_EQ(thread->counter, 10);
@@ -109,10 +112,13 @@ TEST_F(LightThreadTest, ThreadCompletion) {
     event.type = EventType::SocketRead;
     event.fd = 1;
 
-    // First resume returns true
-    EXPECT_TRUE(thread->resume(&event));
+    // start() runs up to the single wait(), so this first resume lets run()
+    // return -- the thread completes here and resume() reports false.
+    EXPECT_FALSE(thread->resume(&event));
 
-    // Second resume returns false (thread completed)
+    // Resuming an already-finished thread must stay a safe no-op. Before
+    // LightThread tracked completion this jumped into the dead context and
+    // killed the process rather than failing the assertion.
     EXPECT_FALSE(thread->resume(&event));
 }
 
@@ -131,7 +137,9 @@ TEST_F(LightThreadTest, MultipleThreads) {
 
     for (int j = 0; j < 10; j++) {
         for (int i = 0; i < NUM_THREADS; i++) {
-            EXPECT_TRUE(threads[i]->resume(&event));
+            // start() already ran each thread up to its first wait(), so the
+            // 10th resume is the one that lets CountingThread::run() return.
+            EXPECT_EQ(threads[i]->resume(&event), j < 9) << "j=" << j << " i=" << i;
         }
     }
 
@@ -189,7 +197,10 @@ TEST_F(LightThreadTest, StackAllocation) {
 
         void recursive(int n) {
             if (n > 0) {
-                depth = n;
+                // Count frames entered. The previous `depth = n` recorded the
+                // innermost call's argument, so depth always ended at 1 and the
+                // assertion below never actually measured the recursion.
+                depth++;
                 recursive(n - 1);
             }
         }
@@ -204,7 +215,11 @@ TEST_F(LightThreadTest, StackAllocation) {
     thread->start(64 * 1024);
 
     Event event;
-    EXPECT_TRUE(thread->resume(&event));
+    // The recursion runs inside start(), before run()'s single wait(), so depth
+    // is already 100 here. This resume just lets run() return, which completes
+    // the thread and therefore reports false.
+    EXPECT_EQ(thread->depth, 100);
+    EXPECT_FALSE(thread->resume(&event));
     EXPECT_EQ(thread->depth, 100);
 }
 
@@ -217,10 +232,12 @@ TEST_F(LightThreadTest, MultipleWaitResumeCycles) {
     event.fd = 1;
 
     for (int i = 0; i < 5; i++) {
-        EXPECT_TRUE(thread->resume(&event));
+        // SimpleThread::run() waits 5 times and start() consumed the first, so
+        // the 5th resume completes run() and correctly reports false.
+        EXPECT_EQ(thread->resume(&event), i < 4) << "i=" << i;
         EXPECT_EQ(thread->wait_count, i + 1);
     }
 
-    // Thread should complete after 5 resumes
+    // Already finished - resuming again stays a safe no-op
     EXPECT_FALSE(thread->resume(&event));
 }

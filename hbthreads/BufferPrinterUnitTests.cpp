@@ -54,9 +54,12 @@ TEST(BufferPrinter, WriteUint32Large) {
 TEST(BufferPrinter, WriteUint64Small) {
     BufferPrinter<64> bp;
     bp << uint64_t(0x0000FFFF);
-    // Small values should be printed as 16-bit
+    // The narrowing is transitive: uint64 -> uint32 (fits) -> uint16 (fits),
+    // so 0xFFFF prints with 16-bit width, matching this test's own comment and
+    // the WriteUint32Small case above. The previous expectation of "0x0000ffff"
+    // assumed only a single uint64 -> uint32 step.
     std::string result(bp._org, bp.size());
-    EXPECT_EQ(result, "0x0000ffff");
+    EXPECT_EQ(result, "0xffff");
 }
 
 TEST(BufferPrinter, WriteUint64Large) {
